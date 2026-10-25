@@ -486,43 +486,135 @@
         </div>
       </div>
 
-      <!-- CR-Touch 4-Corner Leveling Visualizer Card -->
-      <div class="bg-surface rounded-2xl p-3.5 border border-surfaceBorder mb-3.5">
+      <!-- CR-Touch 4-Corner Leveling with Circular Screw Dials (Крутилки со шкалой) -->
+      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder mb-3.5 shadow-md">
         <div class="flex items-center justify-between mb-2">
           <span class="text-xs font-bold text-white flex items-center gap-1.5">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-400"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
             Калибровка стола: 4 винта (CR-Touch)
           </span>
-          <button onclick="sendCommand('SCREWS_LEVELING')" class="text-[10px] text-purple-400 hover:underline">Запустить замер</button>
+          <span class="text-[10px] text-purple-400 font-mono font-bold" id="screwsStatusHeader">Готов к замеру</span>
         </div>
-        <p class="text-[10px] text-slate-400 mb-2.5">Замер наклона винтов через CR-Touch с расчётом минут вращения:</p>
+        <p class="text-[10px] text-slate-400 mb-3">Интерактивные крутилки винтов: направление (↻ CW / ↺ CCW) и угол поворота:</p>
         
-        <!-- Bed Graphic (4 corners) -->
-        <div class="bg-slate-950 p-2.5 rounded-xl border border-surfaceBorder/80 grid grid-cols-2 gap-2 text-center text-[10px] mb-2.5">
-          <div class="p-2 bg-slate-900/80 rounded-lg border border-surfaceBorder/60">
-            <span class="text-slate-500 block text-[9px]">Задний левый:</span>
-            <span class="font-mono font-bold text-slate-300" id="screwRL">00:00 (База)</span>
+        <!-- Bed Plate with 4 Corner Dials (300x300 Layout) -->
+        <div class="bg-slate-950 p-3 rounded-2xl border border-surfaceBorder/80 mb-3 relative overflow-hidden">
+          <div class="absolute inset-0 bg-[radial-gradient(#1f293d_1px,transparent_1px)] [background-size:16px_16px] opacity-30 pointer-events-none"></div>
+          
+          <!-- Top Row: Rear Screws (RL & RR) -->
+          <div class="grid grid-cols-2 gap-3 mb-3 relative z-10">
+            <!-- Rear Left (RL) -->
+            <div id="cardRL" class="flex flex-col items-center bg-slate-900/80 p-2.5 rounded-2xl border border-surfaceBorder/70 transition-all duration-300">
+              <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Задний левый</span>
+              <div class="relative w-16 h-16 flex items-center justify-center my-0.5">
+                <svg class="w-full h-full" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="#1f2937" stroke-width="3" stroke-dasharray="2 6"/>
+                  <line x1="50" y1="4" x2="50" y2="10" stroke="#64748b" stroke-width="2"/>
+                  <line x1="96" y1="50" x2="90" y2="50" stroke="#64748b" stroke-width="2"/>
+                  <line x1="50" y1="96" x2="50" y2="90" stroke="#64748b" stroke-width="2"/>
+                  <line x1="4" y1="50" x2="10" y2="50" stroke="#64748b" stroke-width="2"/>
+                  <circle cx="50" cy="50" r="33" fill="#0b1120" stroke="#334155" stroke-width="2"/>
+                  <circle cx="50" cy="50" r="26" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-dasharray="4 8"/>
+                  <g id="dialNeedle-RL" transform="rotate(18, 50, 50)" class="transition-transform duration-700 ease-out">
+                    <line x1="50" y1="50" x2="50" y2="20" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+                    <polygon points="50,14 46,22 54,22" fill="#38bdf8"/>
+                    <circle cx="50" cy="50" r="4" fill="#38bdf8"/>
+                  </g>
+                </svg>
+                <div id="dialCenter-RL" class="absolute inset-0 flex items-center justify-center pointer-events-none text-cyan-400 font-bold text-xs">↻</div>
+              </div>
+              <span id="screwRL" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 mb-0.5">CW 00:03 (18°)</span>
+              <span id="screwTextRL" class="text-[9px] text-slate-400 text-center font-medium">По часовой ~3 мин</span>
+            </div>
+
+            <!-- Rear Right (RR) -->
+            <div id="cardRR" class="flex flex-col items-center bg-slate-900/80 p-2.5 rounded-2xl border border-surfaceBorder/70 transition-all duration-300">
+              <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Задний правый</span>
+              <div class="relative w-16 h-16 flex items-center justify-center my-0.5">
+                <svg class="w-full h-full" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="#1f2937" stroke-width="3" stroke-dasharray="2 6"/>
+                  <line x1="50" y1="4" x2="50" y2="10" stroke="#64748b" stroke-width="2"/>
+                  <line x1="96" y1="50" x2="90" y2="50" stroke="#64748b" stroke-width="2"/>
+                  <line x1="50" y1="96" x2="50" y2="90" stroke="#64748b" stroke-width="2"/>
+                  <line x1="4" y1="50" x2="10" y2="50" stroke="#64748b" stroke-width="2"/>
+                  <circle cx="50" cy="50" r="33" fill="#0b1120" stroke="#334155" stroke-width="2"/>
+                  <circle cx="50" cy="50" r="26" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-dasharray="4 8"/>
+                  <g id="dialNeedle-RR" transform="rotate(-84, 50, 50)" class="transition-transform duration-700 ease-out">
+                    <line x1="50" y1="50" x2="50" y2="20" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+                    <polygon points="50,14 46,22 54,22" fill="#f59e0b"/>
+                    <circle cx="50" cy="50" r="4" fill="#f59e0b"/>
+                  </g>
+                </svg>
+                <div id="dialCenter-RR" class="absolute inset-0 flex items-center justify-center pointer-events-none text-amber-400 font-bold text-xs">↺</div>
+              </div>
+              <span id="screwRR" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 mb-0.5">CCW 00:14 (84°)</span>
+              <span id="screwTextRR" class="text-[9px] text-slate-400 text-center font-medium">Против часовой ~14 мин</span>
+            </div>
           </div>
-          <div class="p-2 bg-slate-900/80 rounded-lg border border-surfaceBorder/60">
-            <span class="text-slate-500 block text-[9px]">Задний правый:</span>
-            <span class="font-mono font-bold text-slate-300" id="screwRR">--:--</span>
+
+          <!-- Center Plate Label -->
+          <div class="flex items-center justify-center py-1 mb-3">
+            <div class="px-3 py-1 rounded-xl bg-slate-900 border border-surfaceBorder/80 text-[10px] font-mono text-slate-400 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+              СТОЛ 300 × 300 мм
+            </div>
           </div>
-          <div class="p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-            <span class="text-emerald-400 block text-[9px]">Передний левый (База):</span>
-            <span class="font-mono font-bold text-emerald-300">00:00 Не крутить</span>
-          </div>
-          <div class="p-2 bg-slate-900/80 rounded-lg border border-surfaceBorder/60">
-            <span class="text-slate-500 block text-[9px]">Передний правый:</span>
-            <span class="font-mono font-bold text-slate-300" id="screwFR">--:--</span>
+
+          <!-- Bottom Row: Front Screws (FL [Base] & FR) -->
+          <div class="grid grid-cols-2 gap-3 relative z-10">
+            <!-- Front Left (FL) - REFERENCE BASE -->
+            <div id="cardFL" class="flex flex-col items-center bg-emerald-950/20 p-2.5 rounded-2xl border border-emerald-500/30 transition-all duration-300">
+              <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Передний левый (База)</span>
+              <div class="relative w-16 h-16 flex items-center justify-center my-0.5">
+                <svg class="w-full h-full" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="#065f46" stroke-width="3" stroke-dasharray="2 6"/>
+                  <circle cx="50" cy="50" r="33" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
+                  <path d="M40 50 L47 57 L62 40" fill="none" stroke="#34d399" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none text-emerald-300 font-bold text-xs">✓</div>
+              </div>
+              <span id="screwFL" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 mb-0.5">00:00 (БАЗА)</span>
+              <span id="screwTextFL" class="text-[9px] text-emerald-400/80 text-center font-medium">Не крутить (Эталон)</span>
+            </div>
+
+            <!-- Front Right (FR) -->
+            <div id="cardFR" class="flex flex-col items-center bg-slate-900/80 p-2.5 rounded-2xl border border-surfaceBorder/70 transition-all duration-300">
+              <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Передний правый</span>
+              <div class="relative w-16 h-16 flex items-center justify-center my-0.5">
+                <svg class="w-full h-full" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="#1f2937" stroke-width="3" stroke-dasharray="2 6"/>
+                  <line x1="50" y1="4" x2="50" y2="10" stroke="#64748b" stroke-width="2"/>
+                  <line x1="96" y1="50" x2="90" y2="50" stroke="#64748b" stroke-width="2"/>
+                  <line x1="50" y1="96" x2="50" y2="90" stroke="#64748b" stroke-width="2"/>
+                  <line x1="4" y1="50" x2="10" y2="50" stroke="#64748b" stroke-width="2"/>
+                  <circle cx="50" cy="50" r="33" fill="#0b1120" stroke="#334155" stroke-width="2"/>
+                  <circle cx="50" cy="50" r="26" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-dasharray="4 8"/>
+                  <g id="dialNeedle-FR" transform="rotate(48, 50, 50)" class="transition-transform duration-700 ease-out">
+                    <line x1="50" y1="50" x2="50" y2="20" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+                    <polygon points="50,14 46,22 54,22" fill="#38bdf8"/>
+                    <circle cx="50" cy="50" r="4" fill="#38bdf8"/>
+                  </g>
+                </svg>
+                <div id="dialCenter-FR" class="absolute inset-0 flex items-center justify-center pointer-events-none text-cyan-400 font-bold text-xs">↻</div>
+              </div>
+              <span id="screwFR" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 mb-0.5">CW 00:08 (48°)</span>
+              <span id="screwTextFR" class="text-[9px] text-slate-400 text-center font-medium">По часовой ~8 мин</span>
+            </div>
           </div>
         </div>
 
-        <button onclick="sendCommand('SCREWS_LEVELING')" class="w-full py-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          Запустить замер 4 винтов (CR-Touch)
-        </button>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="sendCommand('SCREWS_LEVELING')" class="py-2.5 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+            Запустить замер стола
+          </button>
+          <button onclick="demoScrewsCycle()" class="py-2.5 bg-slate-900 hover:bg-slate-800 border border-surfaceBorder text-slate-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            Тест крутилок
+          </button>
+        </div>
       </div>
-
+      
       <!-- Service Utilities Bento Grid -->
       <div class="grid grid-cols-2 gap-2 mb-3.5">
         <!-- Bed Prep -->
@@ -749,6 +841,76 @@
     function confirmPowerOff() {
       if (confirm('Запустить процедуру безопасного выключения? Сопло будет охлаждено до 45°C, после чего прозвучит сигнал.')) {
         sendCommand('SAFE_POWER_OFF');
+      }
+    }
+
+    // Update individual screw dial (Крутилка со шкалой)
+    function setScrewDial(corner, dir, mins) {
+      const needle = document.getElementById('dialNeedle-' + corner);
+      const center = document.getElementById('dialCenter-' + corner);
+      const badge = document.getElementById('screw' + corner);
+      const text = document.getElementById('screwText' + corner);
+      const card = document.getElementById('card' + corner);
+      if (!needle || !badge || !text) return;
+
+      const m = parseInt(mins) || 0;
+      const deg = Math.min(360, m * 6); // 1 minute = 6 degrees (60 mins = 360 deg)
+      const rot = (dir === 'CCW') ? -deg : deg;
+
+      needle.setAttribute('transform', `rotate(${rot}, 50, 50)`);
+
+      if (m <= 2) {
+        // Ideal
+        if (card) card.className = 'flex flex-col items-center bg-emerald-950/20 p-2.5 rounded-2xl border border-emerald-500/30 transition-all duration-300';
+        badge.className = 'text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 mb-0.5';
+        badge.innerText = `${dir} 00:${m.toString().padStart(2, '0')} (${deg}°) ✓`;
+        text.innerText = 'Идеально! Не крутить';
+        text.className = 'text-[9px] text-emerald-400 font-medium text-center';
+        if (center) center.innerText = '✓';
+      } else if (m <= 8) {
+        // Minor adjustment
+        if (card) card.className = 'flex flex-col items-center bg-cyan-950/20 p-2.5 rounded-2xl border border-cyan-500/30 transition-all duration-300';
+        badge.className = 'text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 mb-0.5';
+        badge.innerText = `${dir} 00:${m.toString().padStart(2, '0')} (${deg}°)`;
+        text.innerText = (dir === 'CW' ? 'По часовой' : 'Против часовой') + ` ~${m} мин`;
+        text.className = 'text-[9px] text-cyan-400 font-medium text-center';
+        if (center) center.innerText = (dir === 'CW') ? '↻' : '↺';
+      } else {
+        // Major tilt
+        if (card) card.className = 'flex flex-col items-center bg-amber-950/25 p-2.5 rounded-2xl border border-amber-500/40 transition-all duration-300';
+        badge.className = 'text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 mb-0.5';
+        badge.innerText = `${dir} 00:${m.toString().padStart(2, '0')} (${deg}°)`;
+        text.innerText = (dir === 'CW' ? 'По часовой' : 'Против часовой') + ` ~${m} мин`;
+        text.className = 'text-[9px] text-amber-400 font-medium text-center';
+        if (center) center.innerText = (dir === 'CW') ? '↻' : '↺';
+      }
+    }
+
+    // Interactive Demo Cycle for testing the dials
+    let demoStep = 0;
+    function demoScrewsCycle() {
+      triggerHaptic('medium');
+      demoStep = (demoStep + 1) % 3;
+      const header = document.getElementById('screwsStatusHeader');
+
+      if (demoStep === 1) {
+        header.innerText = 'Замер: требуется подстройка';
+        header.className = 'text-[10px] text-amber-400 font-mono font-bold';
+        setScrewDial('RL', 'CW', 6);
+        setScrewDial('RR', 'CCW', 14);
+        setScrewDial('FR', 'CW', 9);
+      } else if (demoStep === 2) {
+        header.innerText = 'Замер: стол идеален! ✓';
+        header.className = 'text-[10px] text-emerald-400 font-mono font-bold';
+        setScrewDial('RL', 'CW', 1);
+        setScrewDial('RR', 'CCW', 1);
+        setScrewDial('FR', 'CW', 2);
+      } else {
+        header.innerText = 'Замер: исходные данные';
+        header.className = 'text-[10px] text-purple-400 font-mono';
+        setScrewDial('RL', 'CW', 3);
+        setScrewDial('RR', 'CCW', 8);
+        setScrewDial('FR', 'CW', 5);
       }
     }
 

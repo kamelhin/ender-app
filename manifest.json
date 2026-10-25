@@ -1,0 +1,19 @@
+{
+  "name": "Ender-3 S1 Plus Cockpit",
+  "short_name": "Ender Cockpit",
+  "description": "Автономный пульт управления 3D-принтером Ender-3 S1 Plus на Klipper",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#080c14",
+  "theme_color": "#080c14",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
