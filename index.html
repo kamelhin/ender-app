@@ -2,14 +2,15 @@
 <html lang="ru" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Ender-3 S1 Plus — Master Cockpit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Ender-3 S1 Plus Cockpit</title>
   
-  <!-- Telegram WebApp JS SDK -->
+  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -17,9 +18,10 @@
         extend: {
           colors: {
             obsidian: '#080c14',
-            surface: '#121824',
-            surfaceHover: '#1a2233',
-            surfaceBorder: '#1e293b',
+            surface: '#111827',
+            surfaceHover: '#1f293d',
+            surfaceBorder: '#1f2937',
+            cardBg: '#131d2e',
             accent: '#10b981', // Emerald
             cyanGlow: '#06b6d4',
             warning: '#f59e0b',
@@ -47,7 +49,7 @@
       transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .btn-tactile:active {
-      transform: scale(0.95);
+      transform: scale(0.96);
       filter: brightness(0.88);
     }
 
@@ -76,9 +78,21 @@
       from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    
+    /* Custom scrollbar for library */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #080c14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 4px;
+    }
   </style>
 </head>
-<body class="p-4 pb-24 max-w-md mx-auto min-h-screen flex flex-col justify-between">
+<body class="p-3.5 pb-24 max-w-md mx-auto min-h-screen flex flex-col justify-between">
 
   <!-- TOP HEADER -->
   <div>
@@ -96,104 +110,116 @@
       
       <div class="flex items-center gap-1.5">
         <button onclick="refreshData()" class="p-2 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-300 btn-tactile">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="refreshIcon"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="refreshIcon"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
         </button>
       </div>
     </header>
 
     <!-- ========================================================================= -->
-    <!-- TAB 1: ПУЛЬТ (MAIN COCKPIT) -->
+    <!-- TAB 1: ПУЛЬТ УПРАВЛЕНИЯ (COCKPIT / DASHBOARD) -->
     <!-- ========================================================================= -->
     <div id="tab-dashboard" class="tab-content active">
-
-      <!-- Temperature Gauges Grid -->
-      <div class="grid grid-cols-2 gap-2.5 mb-3">
-        <!-- Hotend Card -->
-        <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder relative overflow-hidden">
-          <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span class="flex items-center gap-1 font-medium text-orange-400">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-              Сопло
-            </span>
-            <span class="text-[11px] font-mono text-slate-500" id="hotendTarget">/ 0°C</span>
-          </div>
-          <div class="text-2xl font-black tracking-tight text-white flex items-baseline gap-1" id="hotendTemp">
-            24.5<span class="text-xs font-normal text-slate-400">°C</span>
-          </div>
-          <div class="w-full bg-slate-900 rounded-full h-1.5 mt-2 overflow-hidden">
-            <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-1.5 rounded-full transition-all duration-500" id="hotendBar" style="width: 10%"></div>
-          </div>
-        </div>
-
-        <!-- Bed Card -->
-        <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder relative overflow-hidden">
-          <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span class="flex items-center gap-1 font-medium text-cyan-400">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-              Стол 300мм
-            </span>
-            <span class="text-[11px] font-mono text-slate-500" id="bedTarget">/ 0°C</span>
-          </div>
-          <div class="text-2xl font-black tracking-tight text-white flex items-baseline gap-1" id="bedTemp">
-            22.0<span class="text-xs font-normal text-slate-400">°C</span>
-          </div>
-          <div class="w-full bg-slate-900 rounded-full h-1.5 mt-2 overflow-hidden">
-            <div class="bg-gradient-to-r from-blue-500 to-cyan-400 h-1.5 rounded-full transition-all duration-500" id="bedBar" style="width: 5%"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Heat Chips -->
-      <div class="flex items-center gap-1.5 mb-3.5 overflow-x-auto pb-1 scrollbar-none">
-        <button onclick="sendCommand('PREHEAT_PLA')" class="px-2.5 py-1.5 bg-surface hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-xs font-medium text-emerald-400 whitespace-nowrap btn-tactile">
-          🌱 PLA (200/60)
-        </button>
-        <button onclick="sendCommand('PREHEAT_PETG')" class="px-2.5 py-1.5 bg-surface hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-xs font-medium text-orange-400 whitespace-nowrap btn-tactile">
-          🔥 PETG (230/78)
-        </button>
-        <button onclick="sendCommand('PREHEAT_STANDBY')" class="px-2.5 py-1.5 bg-surface hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-xs font-medium text-cyan-400 whitespace-nowrap btn-tactile">
-          🛋 Дежурный
-        </button>
-        <button onclick="sendCommand('COOLDOWN')" class="px-2.5 py-1.5 bg-surface hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-xs font-medium text-slate-400 whitespace-nowrap btn-tactile">
-          ❄️ Остудить
-        </button>
-      </div>
-
+      
       <!-- Live Print Card -->
-      <div class="bg-surface rounded-2xl p-3.5 border border-surfaceBorder mb-3.5 glow-emerald">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-semibold text-slate-200 truncate max-w-[220px]" id="currentFile">Файл не выбран</span>
-          <span class="text-xs font-mono font-bold text-emerald-400" id="printPercent">0%</span>
-        </div>
-        
-        <div class="w-full bg-slate-950 rounded-full h-2.5 p-0.5 border border-surfaceBorder mb-2.5 overflow-hidden">
-          <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500 stripes-active" id="mainProgress" style="width: 0%"></div>
+      <div class="bg-surface rounded-2xl p-4 border border-surfaceBorder mb-3.5 shadow-lg relative overflow-hidden">
+        <div class="flex justify-between items-start mb-2.5">
+          <div class="truncate pr-2">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5" id="printStateBadge">Режим ожидания</span>
+            <h2 class="text-xs font-bold text-white truncate max-w-[210px]" id="currentFile">Файл не выбран</h2>
+          </div>
+          <span class="text-xl font-black font-mono text-emerald-400" id="printPercent">0%</span>
         </div>
 
-        <div class="grid grid-cols-3 gap-2 text-center text-xs border-t border-surfaceBorder/60 pt-2">
-          <div>
-            <p class="text-[9px] text-slate-500 uppercase tracking-wider">Слой</p>
-            <p class="font-mono font-bold text-slate-200 text-xs" id="layerInfo">— / —</p>
-          </div>
-          <div>
-            <p class="text-[9px] text-slate-500 uppercase tracking-wider">Осталось</p>
-            <p class="font-mono font-bold text-slate-200 text-xs" id="etaTime">—</p>
-          </div>
-          <div>
-            <p class="text-[9px] text-slate-500 uppercase tracking-wider">Прошло</p>
-            <p class="font-mono font-bold text-slate-200 text-xs" id="elapsedTime">—</p>
-          </div>
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-950 rounded-full h-3 mb-2.5 p-0.5 border border-surfaceBorder overflow-hidden">
+          <div id="mainProgress" class="bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 h-full rounded-full stripes-active transition-all duration-300" style="width: 0%"></div>
+        </div>
+
+        <div class="flex justify-between text-[11px] text-slate-400 mb-3">
+          <span id="layerInfo">Слой: 0 / 0</span>
+          <span id="timeLeft">Осталось: ~0 мин</span>
         </div>
 
         <!-- Print Action Buttons -->
-        <div class="grid grid-cols-2 gap-2 mt-2.5 pt-2 border-t border-surfaceBorder/60">
-          <button onclick="sendCommand('PAUSE')" class="py-2 px-3 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="sendCommand('RESUME')" class="py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Старт
+          </button>
+          <button onclick="sendCommand('PAUSE')" class="py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="4" height="16" x="6" y="4"/><rect width="4" height="16" x="14" y="4"/></svg>
             Пауза
           </button>
-          <button onclick="sendCommand('RESUME')" class="py-2 px-3 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Продолжить
+          <button onclick="confirmCancel()" class="py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="16" height="16" x="4" y="4" rx="2"/></svg>
+            Стоп
+          </button>
+        </div>
+      </div>
+
+      <!-- Temperature Gauges Grid -->
+      <div class="grid grid-cols-2 gap-3 mb-3.5">
+        <!-- Hotend Extruder -->
+        <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-medium text-slate-400 flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-orange-400"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+              Сопло
+            </span>
+            <span class="text-[10px] font-mono text-slate-500" id="hotendTarget">/ 0°C</span>
+          </div>
+          <div class="text-xl font-bold font-mono text-white mb-2" id="hotendTemp">
+            0.0<span class="text-xs font-normal text-slate-400">°C</span>
+          </div>
+          <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+            <div id="hotendBar" class="bg-gradient-to-r from-amber-500 to-rose-500 h-full rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Heated Bed -->
+        <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-medium text-slate-400 flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan-400"><path d="M2 14h20M2 18h20M2 10h20"/></svg>
+              Стол
+            </span>
+            <span class="text-[10px] font-mono text-slate-500" id="bedTarget">/ 0°C</span>
+          </div>
+          <div class="text-xl font-bold font-mono text-white mb-2" id="bedTemp">
+            0.0<span class="text-xs font-normal text-slate-400">°C</span>
+          </div>
+          <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+            <div id="bedBar" class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Preheat Presets -->
+      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder mb-3.5">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-white flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-400"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Прогрев стола и сопла
+          </span>
+          <span class="text-[10px] text-slate-500">1 клик</span>
+        </div>
+
+        <div class="grid grid-cols-4 gap-1.5 text-[11px]">
+          <button onclick="sendCommand('PREHEAT_STANDBY')" class="p-2 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-center btn-tactile">
+            <p class="font-bold text-slate-200">Дежурный</p>
+            <p class="text-[9px] text-slate-400">50/140°</p>
+          </button>
+          <button onclick="sendCommand('PREHEAT_PLA')" class="p-2 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-center btn-tactile">
+            <p class="font-bold text-emerald-400">PLA</p>
+            <p class="text-[9px] text-slate-400">60/200°</p>
+          </button>
+          <button onclick="sendCommand('PREHEAT_PETG')" class="p-2 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-center btn-tactile">
+            <p class="font-bold text-orange-400">PETG</p>
+            <p class="text-[9px] text-slate-400">78/230°</p>
+          </button>
+          <button onclick="sendCommand('COOLDOWN')" class="p-2 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-center btn-tactile">
+            <p class="font-bold text-cyan-400">Остудить</p>
+            <p class="text-[9px] text-slate-400">0/0°</p>
           </button>
         </div>
       </div>
@@ -203,7 +229,7 @@
         <div class="flex items-center justify-between mb-2">
           <span class="text-xs font-bold text-white flex items-center gap-1.5">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-400"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-            Подсветка 24V (Wi-Fi реле)
+            Подсветка 24V COB (Wi-Fi реле)
           </span>
           <span class="text-[10px] font-mono text-slate-500">2 зоны</span>
         </div>
@@ -211,7 +237,7 @@
         <div class="grid grid-cols-2 gap-2">
           <button onclick="toggleLight('nozzle')" id="btnLightNozzle" class="p-2.5 rounded-xl border border-surfaceBorder bg-slate-900/60 hover:bg-surfaceHover flex items-center justify-between btn-tactile">
             <div class="text-left">
-              <p class="text-[11px] font-bold text-slate-200">💡 Сопло (Z)</p>
+              <p class="text-[11px] font-bold text-slate-200">💡 Сопло (Z-балка)</p>
               <p class="text-[9px] text-slate-500" id="lightNozzleStatus">Выключено</p>
             </div>
             <div class="w-2.5 h-2.5 rounded-full bg-slate-700" id="lightNozzleDot"></div>
@@ -219,7 +245,7 @@
 
           <button onclick="toggleLight('frame')" id="btnLightFrame" class="p-2.5 rounded-xl border border-surfaceBorder bg-slate-900/60 hover:bg-surfaceHover flex items-center justify-between btn-tactile">
             <div class="text-left">
-              <p class="text-[11px] font-bold text-slate-200">💡 Рама (Верх)</p>
+              <p class="text-[11px] font-bold text-slate-200">💡 Рама (Верхний профиль)</p>
               <p class="text-[9px] text-slate-500" id="lightFrameStatus">Выключено</p>
             </div>
             <div class="w-2.5 h-2.5 rounded-full bg-slate-700" id="lightFrameDot"></div>
@@ -228,47 +254,79 @@
       </div>
 
       <!-- Quick Tuning Bar -->
-      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder mb-3">
+      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder mb-3.5">
         <p class="text-xs font-bold text-white mb-2 flex items-center gap-1.5">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan-400"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
-          Тюнинг на лету
+          Тюнинг параметров на лету
         </p>
-        <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="space-y-2 text-xs">
           <!-- Speed -->
           <div class="bg-slate-900/60 p-2 rounded-xl border border-surfaceBorder/60 flex items-center justify-between">
-            <span class="text-[10px] text-slate-400">Скорость:</span>
-            <div class="flex gap-1">
-              <button onclick="sendCommand('TUNE_SPEED_80')" class="px-1.5 py-0.5 bg-surfaceBorder rounded text-[10px] text-slate-300 btn-tactile">80%</button>
-              <button onclick="sendCommand('TUNE_SPEED_100')" class="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 rounded text-[10px] font-bold btn-tactile">100%</button>
-              <button onclick="sendCommand('TUNE_SPEED_120')" class="px-1.5 py-0.5 bg-surfaceBorder rounded text-[10px] text-slate-300 btn-tactile">120%</button>
+            <span class="text-[11px] text-slate-400 flex items-center gap-1">⚡ Скорость печати:</span>
+            <div class="flex gap-1.5">
+              <button onclick="sendCommand('TUNE_SPEED_80')" class="px-2 py-1 bg-surfaceBorder hover:bg-slate-700 rounded text-[10px] text-slate-300 btn-tactile">🐢 80%</button>
+              <button onclick="sendCommand('TUNE_SPEED_100')" class="px-2 py-1 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 rounded text-[10px] font-bold btn-tactile">100%</button>
+              <button onclick="sendCommand('TUNE_SPEED_120')" class="px-2 py-1 bg-surfaceBorder hover:bg-slate-700 rounded text-[10px] text-slate-300 btn-tactile">🚀 120%</button>
             </div>
           </div>
           <!-- Z-Offset -->
           <div class="bg-slate-900/60 p-2 rounded-xl border border-surfaceBorder/60 flex items-center justify-between">
-            <span class="text-[10px] text-slate-400">Z-Смещение:</span>
-            <div class="flex gap-1">
-              <button onclick="sendCommand('TUNE_Z_DOWN')" class="px-1.5 py-0.5 bg-surfaceBorder rounded text-[10px] font-bold text-cyan-400 btn-tactile">-0.02</button>
-              <button onclick="sendCommand('TUNE_Z_UP')" class="px-1.5 py-0.5 bg-surfaceBorder rounded text-[10px] font-bold text-orange-400 btn-tactile">+0.02</button>
+            <span class="text-[11px] text-slate-400 flex items-center gap-1">📏 BabyStepping Z:</span>
+            <div class="flex gap-1.5">
+              <button onclick="sendCommand('TUNE_Z_DOWN')" class="px-2 py-1 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded text-[10px] font-bold text-cyan-400 btn-tactile">⬇️ -0.02</button>
+              <button onclick="sendCommand('TUNE_Z_UP')" class="px-2 py-1 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 rounded text-[10px] font-bold text-orange-400 btn-tactile">⬆️ +0.02</button>
+            </div>
+          </div>
+          <!-- Fan Cooling -->
+          <div class="bg-slate-900/60 p-2 rounded-xl border border-surfaceBorder/60 flex items-center justify-between">
+            <span class="text-[11px] text-slate-400 flex items-center gap-1">💨 Обдув детали:</span>
+            <div class="flex gap-1.5">
+              <button onclick="sendCommand('TUNE_FAN_0')" class="px-2 py-1 bg-surfaceBorder hover:bg-slate-700 rounded text-[10px] text-slate-300 btn-tactile">0%</button>
+              <button onclick="sendCommand('TUNE_FAN_128')" class="px-2 py-1 bg-surfaceBorder hover:bg-slate-700 rounded text-[10px] text-slate-300 btn-tactile">50%</button>
+              <button onclick="sendCommand('TUNE_FAN_255')" class="px-2 py-1 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 rounded text-[10px] font-bold btn-tactile">100%</button>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Room Climate Widget (Yandex Sensor) -->
+      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder mb-3.5">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-xs font-bold text-white flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-400"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Микроклимат комнаты (Яндекс)
+          </span>
+          <span class="text-[9px] text-emerald-400 font-bold" id="climateNote">Оптимально</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-center text-xs">
+          <div class="bg-slate-900/60 p-2 rounded-xl border border-surfaceBorder/60">
+            <p class="text-[10px] text-slate-400">Температура:</p>
+            <p class="text-sm font-bold font-mono text-white" id="climateTemp">--.-°C</p>
+          </div>
+          <div class="bg-slate-900/60 p-2 rounded-xl border border-surfaceBorder/60">
+            <p class="text-[10px] text-slate-400">Влажность воздуха:</p>
+            <p class="text-sm font-bold font-mono text-cyan-400" id="climateHum">--%</p>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- ========================================================================= -->
     <!-- TAB 2: ФАЙЛЫ И ОЧЕРЕДЬ (FILES & QUEUE) -->
     <!-- ========================================================================= -->
     <div id="tab-files" class="tab-content">
+      
       <!-- Queue Section -->
       <div class="bg-surface rounded-2xl p-3.5 border border-surfaceBorder mb-3.5">
         <div class="flex items-center justify-between mb-2">
           <span class="text-xs font-bold text-white flex items-center gap-1.5">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan-400"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
-            Очередь печати
+            Очередь непрерывной печати
           </span>
           <button onclick="sendCommand('QUEUE_CLEAR')" class="text-[10px] text-rose-400 hover:underline">Очистить</button>
         </div>
-        <p class="text-[11px] text-slate-400 mb-3" id="queueStatusText">В очереди пока нет файлов. Выберите файл ниже, чтобы добавить в очередь.</p>
+        <p class="text-[11px] text-slate-400 mb-3" id="queueStatusText">В очереди пока нет файлов. Выберите модель ниже и нажмите «В очередь».</p>
         
         <button onclick="sendCommand('QUEUE_START_NEXT')" class="w-full py-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -276,42 +334,30 @@
         </button>
       </div>
 
-      <!-- Quick File Management Actions -->
-      <div class="space-y-2">
-        <p class="text-xs font-bold text-slate-300">Быстрые действия с файлами:</p>
-        
-        <button onclick="sendCommand('MENU_FILES')" class="w-full p-3 bg-surface hover:bg-surfaceHover border border-surfaceBorder rounded-2xl text-left flex items-center justify-between btn-tactile">
-          <div class="flex items-center gap-2.5">
-            <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
-            </div>
-            <div>
-              <p class="text-xs font-bold text-white">Открыть каталог моделей</p>
-              <p class="text-[10px] text-slate-400">Выбор .gcode файлов в памяти Klipper с превью</p>
-            </div>
-          </div>
-          <span class="text-slate-500 text-xs">➔</span>
-        </button>
-
-        <button onclick="sendCommand('MENU_QUEUE')" class="w-full p-3 bg-surface hover:bg-surfaceHover border border-surfaceBorder rounded-2xl text-left flex items-center justify-between btn-tactile">
-          <div class="flex items-center gap-2.5">
-            <div class="p-2 rounded-xl bg-purple-500/10 text-purple-400">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </div>
-            <div>
-              <p class="text-xs font-bold text-white">Управление очередью в чате</p>
-              <p class="text-[10px] text-slate-400">Порядок печати и автосброс деталей со стола</p>
-            </div>
-          </div>
-          <span class="text-slate-500 text-xs">➔</span>
-        </button>
+      <!-- Models Library Header -->
+      <div class="flex items-center justify-between mb-2.5 px-0.5">
+        <p class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-400"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+          Каталог моделей в памяти Klipper
+        </p>
+        <span class="text-[10px] text-slate-500" id="filesCountBadge">Загрузка...</span>
       </div>
+
+      <!-- Models List Container -->
+      <div id="filesListContainer" class="space-y-3">
+        <!-- Loading Skeleton -->
+        <div class="bg-surface rounded-2xl p-4 border border-surfaceBorder animate-pulse text-center">
+          <p class="text-xs text-slate-400">Загрузка библиотеки файлов...</p>
+        </div>
+      </div>
+
     </div>
 
     <!-- ========================================================================= -->
     <!-- TAB 3: СЕРВИС И КАЛИБРОВКА (SERVICE & TOOLS) -->
     <!-- ========================================================================= -->
     <div id="tab-service" class="tab-content">
+      
       <!-- Emergency Resurrect Card -->
       <div class="bg-surface rounded-2xl p-3.5 border border-amber-500/30 bg-amber-500/5 mb-3.5">
         <div class="flex items-center gap-2.5 mb-2">
@@ -319,93 +365,153 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
           </div>
           <div>
-            <p class="text-xs font-bold text-white">Спасти прерванную печать</p>
-            <p class="text-[10px] text-slate-400">Мастер восстановления после отключения света</p>
+            <p class="text-xs font-bold text-white">Спасти прерванную печать (Resurrect)</p>
+            <p class="text-[10px] text-slate-400">Продолжение печати с точного слоя после отключения питания</p>
           </div>
         </div>
-        <button onclick="sendCommand('CMD_RESURRECT_MENU')" class="w-full py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-300 rounded-xl text-xs font-bold btn-tactile">
-          🩹 Открыть мастер спасения детали
+        <div class="grid grid-cols-2 gap-2 mt-2">
+          <button onclick="sendCommand('RESURRECT_AUTO')" class="py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-300 rounded-xl text-xs font-bold btn-tactile">
+            ⚡ Авто-спасение
+          </button>
+          <button onclick="sendCommand('RESURRECT_ASK_Z')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-surfaceBorder text-slate-200 rounded-xl text-xs font-bold btn-tactile">
+            ✏️ Ввести высоту Z
+          </button>
+        </div>
+      </div>
+
+      <!-- CR-Touch 4-Corner Leveling Visualizer Card -->
+      <div class="bg-surface rounded-2xl p-3.5 border border-surfaceBorder mb-3.5">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-white flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-400"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+            Калибровка стола: 4 винта (CR-Touch)
+          </span>
+          <button onclick="sendCommand('SCREWS_LEVELING')" class="text-[10px] text-purple-400 hover:underline">Запустить замер</button>
+        </div>
+        <p class="text-[10px] text-slate-400 mb-2.5">Замер наклона винтов через CR-Touch с расчётом минут вращения:</p>
+        
+        <!-- Bed Graphic (4 corners) -->
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-surfaceBorder/80 grid grid-cols-2 gap-2 text-center text-[10px] mb-2.5">
+          <div class="p-2 bg-slate-900/80 rounded-lg border border-surfaceBorder/60">
+            <span class="text-slate-500 block text-[9px]">Задний левый:</span>
+            <span class="font-mono font-bold text-slate-300" id="screwRL">00:00 (База)</span>
+          </div>
+          <div class="p-2 bg-slate-900/80 rounded-lg border border-surfaceBorder/60">
+            <span class="text-slate-500 block text-[9px]">Задний правый:</span>
+            <span class="font-mono font-bold text-slate-300" id="screwRR">--:--</span>
+          </div>
+          <div class="p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+            <span class="text-emerald-400 block text-[9px]">Передний левый (База):</span>
+            <span class="font-mono font-bold text-emerald-300">00:00 Не крутить</span>
+          </div>
+          <div class="p-2 bg-slate-900/80 rounded-lg border border-surfaceBorder/60">
+            <span class="text-slate-500 block text-[9px]">Передний правый:</span>
+            <span class="font-mono font-bold text-slate-300" id="screwFR">--:--</span>
+          </div>
+        </div>
+
+        <button onclick="sendCommand('SCREWS_LEVELING')" class="w-full py-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Запустить замер 4 винтов (CR-Touch)
         </button>
       </div>
 
-      <!-- Service Bento Grid -->
-      <div class="grid grid-cols-2 gap-2.5 mb-3.5">
-        <!-- Prepare Bed -->
+      <!-- Service Utilities Bento Grid -->
+      <div class="grid grid-cols-2 gap-2 mb-3.5">
+        <!-- Bed Prep -->
         <button onclick="sendCommand('PREPARE_BED')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
-          <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 w-fit mb-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m14 12-8.5 8.5a2.12 2.12 0 1 1-3-3L11 9"/><path d="M15 13 9 7l4-4 6 6h3a8 8 0 0 1-7 7z"/></svg>
+          <div class="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 w-fit mb-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m14 12-8.5 8.5a2.12 2.12 0 1 1-3-3L11 9"/><path d="M15 13 9 7l4-4 6 6h3a8 8 0 0 1-7 7z"/></svg>
           </div>
-          <p class="text-xs font-bold text-white">Подготовить стол</p>
-          <p class="text-[9px] text-slate-400">Z100, Y290 + нагрев</p>
-        </button>
-
-        <!-- Screws Leveling -->
-        <button onclick="sendCommand('SCREWS_LEVELING')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
-          <div class="p-2 rounded-xl bg-purple-500/10 text-purple-400 w-fit mb-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
-          </div>
-          <p class="text-xs font-bold text-white">Замер 4 винтов</p>
-          <p class="text-[9px] text-slate-400">CR-Touch Screws Tilt</p>
-        </button>
-
-        <!-- Filament Load -->
-        <button onclick="sendCommand('CMD_LOAD_FILAMENT')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
-          <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 w-fit mb-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          </div>
-          <p class="text-xs font-bold text-white">Загрузить нить</p>
-          <p class="text-[9px] text-slate-400">Нагрев 210°C + заправка</p>
-        </button>
-
-        <!-- Filament Unload -->
-        <button onclick="sendCommand('CMD_UNLOAD_FILAMENT')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
-          <div class="p-2 rounded-xl bg-orange-500/10 text-orange-400 w-fit mb-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" x2="8.12" y1="4" y2="15.88"/><line x1="14.47" x2="20" y1="14.48" y2="20"/><line x1="8.12" x2="12" y1="8.12" y2="12"/></svg>
-          </div>
-          <p class="text-xs font-bold text-white">Выгрузить нить</p>
-          <p class="text-[9px] text-slate-400">Откат прутка</p>
+          <p class="text-xs font-bold text-white">Стол вперёд</p>
+          <p class="text-[9px] text-slate-400">Y290, Z100 + прогрев</p>
         </button>
 
         <!-- Service Park -->
-        <button onclick="sendCommand('CMD_SERVICE_PARK')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
-          <div class="p-2 rounded-xl bg-blue-500/10 text-blue-400 w-fit mb-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>
+        <button onclick="sendCommand('SERVICE_PARK')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
+          <div class="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 w-fit mb-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>
           </div>
           <p class="text-xs font-bold text-white">Парковка Z200</p>
-          <p class="text-[9px] text-slate-400">Стол вперед (Y290)</p>
+          <p class="text-[9px] text-slate-400">Для чистки сопла</p>
+        </button>
+
+        <!-- Filament Load -->
+        <button onclick="sendCommand('LOAD_FILAMENT')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
+          <div class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 w-fit mb-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <p class="text-xs font-bold text-white">Загрузка нити</p>
+          <p class="text-[9px] text-slate-400">210°C + подача 60 мм</p>
+        </button>
+
+        <!-- Filament Unload -->
+        <button onclick="sendCommand('UNLOAD_FILAMENT')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
+          <div class="p-1.5 rounded-lg bg-orange-500/10 text-orange-400 w-fit mb-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" x2="8.12" y1="4" y2="15.88"/><line x1="14.47" x2="20" y1="14.48" y2="20"/><line x1="8.12" x2="12" y1="8.12" y2="12"/></svg>
+          </div>
+          <p class="text-xs font-bold text-white">Выгрузка нити</p>
+          <p class="text-[9px] text-slate-400">Откат прутка</p>
+        </button>
+
+        <!-- Dry Filament -->
+        <button onclick="sendCommand('DRY_FILAMENT')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
+          <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 w-fit mb-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <p class="text-xs font-bold text-white">Сушка катушки</p>
+          <p class="text-[9px] text-slate-400">Стол 65°C / 4 часа</p>
         </button>
 
         <!-- Motors Off -->
-        <button onclick="sendCommand('CMD_MOTOR_OFF')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
-          <div class="p-2 rounded-xl bg-rose-500/10 text-rose-400 w-fit mb-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>
+        <button onclick="sendCommand('MOTORS_OFF')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
+          <div class="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 w-fit mb-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>
           </div>
           <p class="text-xs font-bold text-white">Снять моторы</p>
           <p class="text-[9px] text-slate-400">M84 (ручное движение)</p>
         </button>
       </div>
 
-      <!-- Sound & System -->
-      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder mb-3">
+      <!-- Modes & Tunes -->
+      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder mb-3.5">
         <p class="text-xs font-bold text-white mb-2 flex items-center gap-1.5">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-yellow-400"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-          Мелодии динамика (Beam Beeper)
+          Режимы скорости и звуки
         </p>
+        <div class="grid grid-cols-2 gap-2 mb-2">
+          <button onclick="sendCommand('NIGHT_MODE')" class="py-2 px-2.5 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-[11px] font-medium text-slate-200 text-left btn-tactile">
+            🌙 Ночной тихий
+            <span class="block text-[9px] text-slate-400">80% / Accel 1500</span>
+          </button>
+          <button onclick="sendCommand('DAY_MODE')" class="py-2 px-2.5 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-[11px] font-medium text-slate-200 text-left btn-tactile">
+            ☀️ Дневной скоростной
+            <span class="block text-[9px] text-slate-400">100% / Accel 3500</span>
+          </button>
+        </div>
         <div class="grid grid-cols-2 gap-2">
-          <button onclick="sendCommand('CMD_SONG_STAR_WARS')" class="py-2 px-2.5 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-[11px] font-medium text-slate-200 btn-tactile">
+          <button onclick="sendCommand('SONG_STAR_WARS')" class="py-2 px-2.5 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-[11px] font-medium text-slate-200 btn-tactile">
             🎺 Star Wars March
           </button>
-          <button onclick="sendCommand('CMD_SONG_MARIO')" class="py-2 px-2.5 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-[11px] font-medium text-slate-200 btn-tactile">
+          <button onclick="sendCommand('SONG_MARIO')" class="py-2 px-2.5 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-[11px] font-medium text-slate-200 btn-tactile">
             🍄 Super Mario Win
           </button>
         </div>
       </div>
 
-      <!-- Klipper Restart -->
-      <button onclick="sendCommand('CMD_FIRMWARE_RESTART')" class="w-full py-2.5 bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
-        Перезапуск Klipper (FIRMWARE_RESTART)
-      </button>
+      <!-- System Controls (Safe Poweroff & Reboot) -->
+      <div class="space-y-2 mb-3.5">
+        <button onclick="sendCommand('FIRMWARE_RESTART')" class="w-full py-2.5 bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+          Перезапуск Klipper (FIRMWARE_RESTART)
+        </button>
+
+        <button onclick="confirmPowerOff()" class="w-full py-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" x2="12" y1="2" y2="12"/></svg>
+          ⚡ Безопасное выключение принтера
+        </button>
+      </div>
+
     </div>
 
   </div>
@@ -428,16 +534,19 @@
 
       <!-- Tab 3: Service -->
       <button onclick="switchTab('service')" id="nav-service" class="flex flex-col items-center justify-center py-1 rounded-xl text-slate-400 font-medium text-[10px] btn-tactile">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mb-0.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mb-0.5"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         Сервис
       </button>
 
     </div>
   </nav>
 
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // Initialize Telegram WebApp
+    // Universal Bridge (Telegram WebApp & MAX Bridge support)
     const tg = window.Telegram?.WebApp;
+    const maxBridge = window.maxBridge || window.MaxWebApp;
+
     if (tg) {
       tg.ready();
       tg.expand();
@@ -456,6 +565,8 @@
           } else if (type === 'success' || type === 'warning' || type === 'error') {
             tg.HapticFeedback.notificationOccurred(type);
           }
+        } else if (navigator.vibrate) {
+          navigator.vibrate(type === 'heavy' ? 40 : 15);
         }
       } catch (e) {}
     }
@@ -464,16 +575,23 @@
     function switchTab(tabId) {
       triggerHaptic('light');
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.getElementById('tab-' + tabId).classList.add('active');
+      const activeEl = document.getElementById('tab-' + tabId);
+      if (activeEl) activeEl.classList.add('active');
 
       ['dashboard', 'files', 'service'].forEach(t => {
         const btn = document.getElementById('nav-' + t);
-        if (t === tabId) {
-          btn.className = 'flex flex-col items-center justify-center py-1 rounded-xl text-emerald-400 font-bold text-[10px] btn-tactile';
-        } else {
-          btn.className = 'flex flex-col items-center justify-center py-1 rounded-xl text-slate-400 font-medium text-[10px] btn-tactile';
+        if (btn) {
+          if (t === tabId) {
+            btn.className = 'flex flex-col items-center justify-center py-1 rounded-xl text-emerald-400 font-bold text-[10px] btn-tactile';
+          } else {
+            btn.className = 'flex flex-col items-center justify-center py-1 rounded-xl text-slate-400 font-medium text-[10px] btn-tactile';
+          }
         }
       });
+      
+      if (tabId === 'files') {
+        loadFilesCatalog();
+      }
     }
 
     // Light toggles (Dual Zone)
@@ -505,16 +623,32 @@
       triggerHaptic('medium');
       const payload = { cmd: cmd, ...params };
 
-      if (tg) {
+      if (tg && tg.sendData) {
         tg.sendData(JSON.stringify(payload));
+      } else if (maxBridge && maxBridge.sendData) {
+        maxBridge.sendData(JSON.stringify(payload));
       } else {
-        alert('Команда: ' + cmd);
+        console.log('Command sent:', payload);
+        alert('Команда отправлена: ' + cmd + (params.filename ? ' (' + params.filename + ')' : ''));
+      }
+    }
+
+    function confirmCancel() {
+      if (confirm('Вы уверены, что хотите остановить и отменить текущую печать?')) {
+        sendCommand('CANCEL');
+      }
+    }
+
+    function confirmPowerOff() {
+      if (confirm('Запустить процедуру безопасного выключения? Сопло будет охлаждено до 45°C, после чего прозвучит сигнал.')) {
+        sendCommand('SAFE_POWER_OFF');
       }
     }
 
     // Telemetry Sync from URL query params
     function parseParams() {
       const p = new URLSearchParams(window.location.search);
+      
       if (p.has('hotend')) {
         const val = parseFloat(p.get('hotend')).toFixed(1);
         document.getElementById('hotendTemp').innerHTML = `${val}<span class="text-xs font-normal text-slate-400">°C</span>`;
@@ -536,22 +670,41 @@
         document.getElementById('printPercent').innerText = `${pct}%`;
         document.getElementById('mainProgress').style.width = `${pct}%`;
       }
-      if (p.has('file')) {
-        document.getElementById('currentFile').innerText = p.get('file');
+      if (p.has('file') && p.get('file')) {
+        document.getElementById('currentFile').innerText = decodeURIComponent(p.get('file'));
       }
       if (p.has('state')) {
         const st = p.get('state');
         const dot = document.getElementById('statusDot');
         const sub = document.getElementById('statusSub');
+        const badge = document.getElementById('printStateBadge');
         if (st === 'printing') {
           dot.className = 'w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_12px_#10b981]';
-          sub.innerText = 'Идёт печать...';
+          sub.innerText = 'Идёт печать детали...';
+          badge.innerText = 'В процессе печати';
+          badge.className = 'text-[10px] uppercase font-bold tracking-wider text-emerald-400 block mb-0.5';
         } else if (st === 'paused') {
           dot.className = 'w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_12px_#f59e0b]';
           sub.innerText = 'Печать на паузе';
+          badge.innerText = 'Пауза';
+          badge.className = 'text-[10px] uppercase font-bold tracking-wider text-amber-400 block mb-0.5';
         } else {
           dot.className = 'w-3 h-3 rounded-full bg-slate-400';
-          sub.innerText = 'Готов к печати';
+          sub.innerText = 'Принтер в режиме ожидания';
+          badge.innerText = 'Режим ожидания (Standby)';
+          badge.className = 'text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5';
+        }
+      }
+      if (p.has('room_t')) {
+        document.getElementById('climateTemp').innerText = parseFloat(p.get('room_t')).toFixed(1) + '°C';
+      }
+      if (p.has('room_h')) {
+        document.getElementById('climateHum').innerText = parseInt(p.get('room_h')) + '%';
+      }
+      if (p.has('queue_len')) {
+        const ql = parseInt(p.get('queue_len'));
+        if (ql > 0) {
+          document.getElementById('queueStatusText').innerText = `В очереди ожидает ${ql} файл(ов). Готов к автозапуску.`;
         }
       }
     }
@@ -563,7 +716,88 @@
       sendCommand('REFRESH_STATUS');
     }
 
+    // Dynamic Models Library Loader
+    async function loadFilesCatalog() {
+      const container = document.getElementById('filesListContainer');
+      const badge = document.getElementById('filesCountBadge');
+      
+      try {
+        const resp = await fetch('files.json?t=' + Date.now());
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const files = await resp.json();
+        
+        badge.innerText = `${files.length} моделей`;
+        if (files.length === 0) {
+          container.innerHTML = '<div class="p-6 text-center text-slate-500 text-xs bg-surface rounded-2xl border border-surfaceBorder">В памяти Klipper нет файлов .gcode</div>';
+          return;
+        }
+
+        let html = '';
+        files.forEach(file => {
+          const thumbHtml = file.thumbnail
+            ? `<img src="${file.thumbnail}" alt="3D" class="w-16 h-16 rounded-xl object-contain bg-slate-950 p-1 border border-surfaceBorder shrink-0" onerror="this.onerror=null; this.src=''; this.className='hidden'">`
+            : `<div class="w-16 h-16 rounded-xl bg-slate-950 border border-surfaceBorder flex items-center justify-center text-slate-600 shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>`;
+
+          html += `
+            <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder shadow-md hover:border-slate-700 transition">
+              <div class="flex gap-3 mb-2.5">
+                ${thumbHtml}
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-xs font-bold text-white truncate mb-1" title="${file.filename}">${file.displayName}</h3>
+                  <div class="flex flex-wrap gap-1.5 text-[10px] text-slate-300">
+                    <span class="px-1.5 py-0.5 rounded bg-slate-900 border border-surfaceBorder/80 font-mono text-cyan-400">⏱ ${file.time}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-slate-900 border border-surfaceBorder/80 text-amber-400">🧵 ${file.filamentWeight} (${file.material})</span>
+                    <span class="px-1.5 py-0.5 rounded bg-slate-900 border border-surfaceBorder/80 text-slate-400 font-mono">📦 ${file.sizeMb} МБ</span>
+                  </div>
+                  <div class="flex items-center gap-2 mt-1 text-[9px] text-slate-500">
+                    <span>Слои: ${file.totalLayers}</span>
+                    <span>•</span>
+                    <span>Стол ${file.bedTemp}° / Сопло ${file.nozzleTemp}°</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card Action Buttons -->
+              <div class="grid grid-cols-2 gap-2 pt-2 border-t border-surfaceBorder/60">
+                <button onclick="startPrintDirect('${file.filename}')" class="py-1.5 px-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 btn-tactile">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  Напечатать
+                </button>
+                <button onclick="addToQueue('${file.filename}')" class="py-1.5 px-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 btn-tactile">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                  В очередь
+                </button>
+              </div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      } catch (err) {
+        console.error('Catalog load error:', err);
+        container.innerHTML = `
+          <div class="p-4 bg-surface rounded-2xl border border-surfaceBorder text-center">
+            <p class="text-xs text-rose-400 font-medium mb-1">Ошибка загрузки каталога</p>
+            <p class="text-[10px] text-slate-500 mb-2">Проверьте подключение к сети или обновите список</p>
+            <button onclick="loadFilesCatalog()" class="px-3 py-1 bg-slate-800 text-xs text-slate-300 rounded-lg">Повторить</button>
+          </div>
+        `;
+      }
+    }
+
+    function startPrintDirect(fname) {
+      if (confirm(`Запустить печать модели "${fname}" прямо сейчас?`)) {
+        sendCommand('START_PRINT', { filename: fname });
+        switchTab('dashboard');
+      }
+    }
+
+    function addToQueue(fname) {
+      sendCommand('QUEUE_ADD', { filename: fname });
+      alert(`Файл "${fname}" добавлен в очередь печати!`);
+    }
+
     parseParams();
+    loadFilesCatalog();
   </script>
 </body>
 </html>
