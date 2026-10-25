@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ender-3 S1 Plus — Dashboard</title>
+  
+  <!-- Telegram WebApp JS SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#0b0f17',
+            surface: '#151c28',
+            surfaceHover: '#1e293b',
+            accent: '#10b981', // Emerald
+            cyanGlow: '#06b6d4',
+            warning: '#f59e0b',
+            danger: '#ef4444',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #0b0f17;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    
+    .glow-emerald {
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+    }
+    .glow-orange {
+      box-shadow: 0 0 25px rgba(249, 115, 22, 0.25);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 25px rgba(6, 182, 212, 0.25);
+    }
+    
+    /* Tactile button micro-animation */
+    .btn-tactile {
+      transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-tactile:active {
+      transform: scale(0.96);
+      filter: brightness(0.9);
+    }
+
+    /* Custom progress bar stripe animation */
+    @keyframes move-stripes {
+      from { background-position: 0 0; }
+      to { background-position: 40px 0; }
+    }
+    .stripes-active {
+      background-image: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.15) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.15) 75%,
+        transparent 75%,
+        transparent
+      );
+      background-size: 40px 40px;
+      animation: move-stripes 2s linear infinite;
+    }
+  </style>
+</head>
+<body class="p-4 pb-20 max-w-md mx-auto min-h-screen flex flex-col justify-between">
+
+  <!-- Header & Status -->
+  <div>
+    <header class="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-4">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_12px_#10b981]" id="statusDot"></div>
+        <div>
+          <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+            Ender-3 S1 Plus
+            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Klipper</span>
+          </h1>
+          <p class="text-xs text-slate-400 font-medium" id="statusSub">Готов к печати</p>
+        </div>
+      </div>
+      
+      <button onclick="triggerHaptic('light'); refreshData();" class="p-2 rounded-xl bg-surface hover:bg-surfaceHover border border-slate-800 text-slate-300 btn-tactile">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="refreshIcon"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+      </button>
+    </header>
+
+    <!-- Temperature Gauges Grid -->
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <!-- Hotend Card -->
+      <div class="bg-surface rounded-2xl p-3.5 border border-slate-800/80 relative overflow-hidden">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+          <span class="flex items-center gap-1 font-medium text-orange-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+            Сопло
+          </span>
+          <span class="text-[11px] font-mono text-slate-500" id="hotendTarget">/ 0°C</span>
+        </div>
+        <div class="text-2xl font-black tracking-tight text-white flex items-baseline gap-1" id="hotendTemp">
+          24.5<span class="text-sm font-normal text-slate-400">°C</span>
+        </div>
+        <div class="w-full bg-slate-800/80 rounded-full h-1.5 mt-2.5 overflow-hidden">
+          <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-1.5 rounded-full transition-all duration-500" id="hotendBar" style="width: 10%"></div>
+        </div>
+      </div>
+
+      <!-- Bed Card -->
+      <div class="bg-surface rounded-2xl p-3.5 border border-slate-800/80 relative overflow-hidden">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+          <span class="flex items-center gap-1 font-medium text-cyan-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            Стол 300мм
+          </span>
+          <span class="text-[11px] font-mono text-slate-500" id="bedTarget">/ 0°C</span>
+        </div>
+        <div class="text-2xl font-black tracking-tight text-white flex items-baseline gap-1" id="bedTemp">
+          22.0<span class="text-sm font-normal text-slate-400">°C</span>
+        </div>
+        <div class="w-full bg-slate-800/80 rounded-full h-1.5 mt-2.5 overflow-hidden">
+          <div class="bg-gradient-to-r from-blue-500 to-cyan-400 h-1.5 rounded-full transition-all duration-500" id="bedBar" style="width: 5%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Heat Chips -->
+    <div class="flex items-center gap-2 mb-4 overflow-x-auto pb-1 scrollbar-none">
+      <button onclick="sendCommand('PREHEAT_PLA')" class="px-3 py-1.5 bg-surface hover:bg-surfaceHover border border-slate-800 rounded-xl text-xs font-medium text-emerald-400 whitespace-nowrap btn-tactile">
+        🌱 PLA (200 / 60)
+      </button>
+      <button onclick="sendCommand('PREHEAT_PETG')" class="px-3 py-1.5 bg-surface hover:bg-surfaceHover border border-slate-800 rounded-xl text-xs font-medium text-orange-400 whitespace-nowrap btn-tactile">
+        🔥 PETG (230 / 78)
+      </button>
+      <button onclick="sendCommand('PREHEAT_STANDBY')" class="px-3 py-1.5 bg-surface hover:bg-surfaceHover border border-slate-800 rounded-xl text-xs font-medium text-cyan-400 whitespace-nowrap btn-tactile">
+        🛋 Дежурный (140 / 50)
+      </button>
+      <button onclick="sendCommand('COOLDOWN')" class="px-3 py-1.5 bg-surface hover:bg-surfaceHover border border-slate-800 rounded-xl text-xs font-medium text-slate-400 whitespace-nowrap btn-tactile">
+        ❄️ Остудить
+      </button>
+    </div>
+
+    <!-- Live Print Progress Card -->
+    <div class="bg-surface rounded-2xl p-4 border border-slate-800/80 mb-4 glow-emerald">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-slate-300 truncate max-w-[200px]" id="currentFile">Файл не выбран</span>
+        <span class="text-xs font-mono font-bold text-emerald-400" id="printPercent">0%</span>
+      </div>
+      
+      <!-- Progress Bar -->
+      <div class="w-full bg-slate-900 rounded-full h-3 p-0.5 border border-slate-800 mb-3 overflow-hidden">
+        <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500 stripes-active" id="mainProgress" style="width: 0%"></div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-center text-xs border-t border-slate-800/60 pt-2.5">
+        <div>
+          <p class="text-[10px] text-slate-500 uppercase tracking-wider">Слой</p>
+          <p class="font-mono font-bold text-slate-200" id="layerInfo">— / —</p>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-500 uppercase tracking-wider">Осталось</p>
+          <p class="font-mono font-bold text-slate-200" id="etaTime">—</p>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-500 uppercase tracking-wider">Прошло</p>
+          <p class="font-mono font-bold text-slate-200" id="elapsedTime">—</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons during printing -->
+      <div class="grid grid-cols-2 gap-2 mt-3 pt-2 border-t border-slate-800/60">
+        <button onclick="sendCommand('PAUSE')" class="py-2 px-3 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          Пауза
+        </button>
+        <button onclick="sendCommand('RESUME')" class="py-2 px-3 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Продолжить
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Tools Bento Grid -->
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <!-- Prepare Bed -->
+      <button onclick="sendCommand('PREPARE_BED')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-slate-800 text-left flex flex-col justify-between btn-tactile">
+        <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 w-fit mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m14 12-8.5 8.5a2.12 2.12 0 1 1-3-3L11 9"/><path d="M15 13 9 7l4-4 6 6h3a8 8 0 0 1-7 7z"/></svg>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-white">Подготовить стол</p>
+          <p class="text-[10px] text-slate-400">Z100, Y290 + дежурный нагрев</p>
+        </div>
+      </button>
+
+      <!-- Auto Level Screws -->
+      <button onclick="sendCommand('SCREWS_LEVELING')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-slate-800 text-left flex flex-col justify-between btn-tactile">
+        <div class="p-2 rounded-xl bg-purple-500/10 text-purple-400 w-fit mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-white">Замер 4 винтов</p>
+          <p class="text-[10px] text-slate-400">CR-Touch Screws Tilt Adjust</p>
+        </div>
+      </button>
+    </div>
+
+    <!-- Smart Light Controls (Dual Zone) -->
+    <div class="bg-surface rounded-2xl p-3.5 border border-slate-800/80 mb-4">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-bold text-white flex items-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-400"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+          Умная подсветка (24V COB)
+        </span>
+        <span class="text-[10px] font-mono text-slate-500">2 зоны</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="toggleLight('nozzle')" id="btnLightNozzle" class="p-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 flex items-center justify-between btn-tactile">
+          <div class="text-left">
+            <p class="text-[11px] font-bold text-slate-200">💡 Сопло (Z)</p>
+            <p class="text-[9px] text-slate-500" id="lightNozzleStatus">Выключено</p>
+          </div>
+          <div class="w-2.5 h-2.5 rounded-full bg-slate-700" id="lightNozzleDot"></div>
+        </button>
+
+        <button onclick="toggleLight('frame')" id="btnLightFrame" class="p-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 flex items-center justify-between btn-tactile">
+          <div class="text-left">
+            <p class="text-[11px] font-bold text-slate-200">💡 Рама (Верх)</p>
+            <p class="text-[9px] text-slate-500" id="lightFrameStatus">Выключено</p>
+          </div>
+          <div class="w-2.5 h-2.5 rounded-full bg-slate-700" id="lightFrameDot"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Tuning Accordion -->
+    <div class="bg-surface rounded-2xl p-3.5 border border-slate-800/80 mb-4">
+      <p class="text-xs font-bold text-white mb-2.5 flex items-center gap-1.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan-400"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
+        Тюнинг на лету
+      </p>
+
+      <div class="space-y-2 text-xs">
+        <!-- Speed -->
+        <div class="flex items-center justify-between bg-slate-900/60 p-2 rounded-xl border border-slate-800/50">
+          <span class="text-slate-400 text-[11px]">Скорость:</span>
+          <div class="flex items-center gap-1">
+            <button onclick="sendCommand('TUNE_SPEED_80')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-mono text-slate-300 btn-tactile">80%</button>
+            <button onclick="sendCommand('TUNE_SPEED_100')" class="px-2 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-lg text-[10px] font-mono font-bold btn-tactile">100%</button>
+            <button onclick="sendCommand('TUNE_SPEED_120')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-mono text-slate-300 btn-tactile">120%</button>
+          </div>
+        </div>
+
+        <!-- Z-Offset BabyStepping -->
+        <div class="flex items-center justify-between bg-slate-900/60 p-2 rounded-xl border border-slate-800/50">
+          <span class="text-slate-400 text-[11px]">Z-Offset (Высота):</span>
+          <div class="flex items-center gap-1">
+            <button onclick="sendCommand('TUNE_Z_DOWN')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-mono font-bold text-cyan-400 btn-tactile">⬇️ -0.02</button>
+            <button onclick="sendCommand('TUNE_Z_UP')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-mono font-bold text-orange-400 btn-tactile">⬆️ +0.02</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Actions -->
+  <footer class="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-500">
+    <div class="flex items-center gap-1">
+      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <span class="text-[10px]">Ender Bot Active</span>
+    </div>
+    <button onclick="triggerHaptic('medium'); window.Telegram?.WebApp?.close();" class="text-xs text-slate-400 hover:text-white underline font-medium">
+      Закрыть пульт
+    </button>
+  </footer>
+
+  <script>
+    // Initialize Telegram WebApp
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      try {
+        tg.setHeaderColor('#0b0f17');
+        tg.setBackgroundColor('#0b0f17');
+      } catch (e) {}
+    }
+
+    // Haptic feedback helper
+    function triggerHaptic(type = 'light') {
+      try {
+        if (tg?.HapticFeedback) {
+          if (type === 'light' || type === 'medium' || type === 'heavy') {
+            tg.HapticFeedback.impactOccurred(type);
+          } else if (type === 'success' || type === 'warning' || type === 'error') {
+            tg.HapticFeedback.notificationOccurred(type);
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Light toggles state
+    let lightState = { nozzle: false, frame: false };
+    function toggleLight(zone) {
+      triggerHaptic('medium');
+      lightState[zone] = !lightState[zone];
+      
+      const isNozzle = (zone === 'nozzle');
+      const dot = document.getElementById(isNozzle ? 'lightNozzleDot' : 'lightFrameDot');
+      const status = document.getElementById(isNozzle ? 'lightNozzleStatus' : 'lightFrameStatus');
+      const isOn = lightState[zone];
+
+      if (isOn) {
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]';
+        status.innerText = 'Включено';
+        status.className = 'text-[9px] text-emerald-400 font-bold';
+      } else {
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-slate-700';
+        status.innerText = 'Выключено';
+        status.className = 'text-[9px] text-slate-500';
+      }
+
+      sendCommand(isNozzle ? (isOn ? 'LIGHT_NOZZLE_ON' : 'LIGHT_NOZZLE_OFF') : (isOn ? 'LIGHT_FRAME_ON' : 'LIGHT_FRAME_OFF'));
+    }
+
+    // Send command to bot
+    function sendCommand(cmd, params = {}) {
+      triggerHaptic('medium');
+      const payload = { cmd: cmd, ...params };
+      console.log('Sending command to Telegram Bot:', payload);
+
+      if (tg) {
+        // Send data directly back into the chat
+        tg.sendData(JSON.stringify(payload));
+      } else {
+        alert('Команда отправлена: ' + cmd);
+      }
+    }
+
+    // Parse URL query params for initial live telemetry
+    function parseParams() {
+      const p = new URLSearchParams(window.location.search);
+      if (p.has('hotend')) {
+        const val = parseFloat(p.get('hotend')).toFixed(1);
+        document.getElementById('hotendTemp').innerHTML = `${val}<span class="text-sm font-normal text-slate-400">°C</span>`;
+        document.getElementById('hotendBar').style.width = Math.min(100, (parseFloat(val) / 260) * 100) + '%';
+      }
+      if (p.has('hotend_target')) {
+        document.getElementById('hotendTarget').innerText = `/ ${parseInt(p.get('hotend_target'))}°C`;
+      }
+      if (p.has('bed')) {
+        const val = parseFloat(p.get('bed')).toFixed(1);
+        document.getElementById('bedTemp').innerHTML = `${val}<span class="text-sm font-normal text-slate-400">°C</span>`;
+        document.getElementById('bedBar').style.width = Math.min(100, (parseFloat(val) / 100) * 100) + '%';
+      }
+      if (p.has('bed_target')) {
+        document.getElementById('bedTarget').innerText = `/ ${parseInt(p.get('bed_target'))}°C`;
+      }
+      if (p.has('progress')) {
+        const pct = parseInt(p.get('progress'));
+        document.getElementById('printPercent').innerText = `${pct}%`;
+        document.getElementById('mainProgress').style.width = `${pct}%`;
+      }
+      if (p.has('file')) {
+        document.getElementById('currentFile').innerText = p.get('file');
+      }
+      if (p.has('state')) {
+        const st = p.get('state');
+        const dot = document.getElementById('statusDot');
+        const sub = document.getElementById('statusSub');
+        if (st === 'printing') {
+          dot.className = 'w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_12px_#10b981]';
+          sub.innerText = 'Печатает...';
+        } else if (st === 'paused') {
+          dot.className = 'w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_12px_#f59e0b]';
+          sub.innerText = 'На паузе';
+        } else {
+          dot.className = 'w-3 h-3 rounded-full bg-slate-400';
+          sub.innerText = 'В ожидании';
+        }
+      }
+    }
+
+    function refreshData() {
+      const icon = document.getElementById('refreshIcon');
+      icon.classList.add('animate-spin');
+      setTimeout(() => icon.classList.remove('animate-spin'), 600);
+      sendCommand('REFRESH_STATUS');
+    }
+
+    parseParams();
+  </script>
+</body>
+</html>
