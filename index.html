@@ -1009,7 +1009,7 @@
           connBadge.innerText = 'ОФЛАЙН';
           connBadge.className = 'text-[9px] uppercase px-1.5 py-0.5 rounded font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40';
         }
-        if (connSubtitle) connSubtitle.innerText = 'Питание обесточено • Реле выключено';
+        if (connSubtitle) connSubtitle.innerText = 'Питание 24V обесточено • MCU не отвечает';
         const pulseTag = document.getElementById('connPulseTag'); if (pulseTag) { pulseTag.innerText = 'ОФЛАЙН'; pulseTag.className = 'text-[9px] uppercase px-2.5 py-0.5 rounded-full font-mono font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30'; }
       } else if (s === 'disconnected' || s === 'error' || s === 'shutdown') {
         // 🟡 ПОТЕРЯ СВЯЗИ
@@ -1026,8 +1026,25 @@
           connBadge.innerText = 'ВНИМАНИЕ';
           connBadge.className = 'text-[9px] uppercase px-1.5 py-0.5 rounded font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40';
         }
-        if (connSubtitle) connSubtitle.innerText = 'Moonraker не отвечает или MCU отключен';
+        if (connSubtitle) connSubtitle.innerText = 'Moonraker активен, но Klipper остановлен или потерял связь';
         const pulseTag = document.getElementById('connPulseTag'); if (pulseTag) { pulseTag.innerText = 'СВЯЗЬ'; pulseTag.className = 'text-[9px] uppercase px-2.5 py-0.5 rounded-full font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30'; }
+      } else if (s === 'paused') {
+        // ⏸ НА ПАУЗЕ
+        if (dot) dot.className = 'w-3 h-3 rounded-full bg-amber-400 shadow-[0_0_12px_#fbbf24]';
+        if (sub) sub.innerText = 'В сети • Печать на паузе';
+        if (badge) {
+          badge.innerText = 'НА ПАУЗЕ';
+          badge.className = 'text-[10px] uppercase font-bold tracking-wider text-amber-300 block mb-0.5';
+        }
+        if (banner) banner.className = 'flex items-center justify-between p-2.5 px-3 rounded-2xl bg-amber-950/20 border border-amber-500/30 mb-3.5 transition-all duration-300 shadow-md';
+        if (connDot) connDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_10px_#fbbf24]';
+        if (connTitle) connTitle.innerText = 'НА ПАУЗЕ';
+        if (connBadge) {
+          connBadge.innerText = 'ПАУЗА';
+          connBadge.className = 'text-[9px] uppercase px-1.5 py-0.5 rounded font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        }
+        if (connSubtitle) connSubtitle.innerText = 'Печать временно приостановлена';
+        const pulseTag = document.getElementById('connPulseTag'); if (pulseTag) { pulseTag.innerText = 'ПАУЗА'; pulseTag.className = 'text-[9px] uppercase px-2.5 py-0.5 rounded-full font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30'; }
       } else if (s === 'printing') {
         // 🟢 ОНЛАЙН - ИДЁТ ПЕЧАТЬ
         if (dot) dot.className = 'w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_12px_#10b981]';
@@ -1163,7 +1180,15 @@
         document.getElementById('currentFile').innerText = decodeURIComponent(p.get('file'));
       }
 
-      const st = p.get('state') || p.get('status') || 'online';
+      let st = (p.get('state') || p.get('status') || '').toLowerCase();
+      // Physical sanity trigger: If hotend and bed temperatures are 0.0, the printer is definitely unpowered or disconnected!
+      if (!st || st === 'standby' || st === 'ready' || st === 'online') {
+        if (hotendCur <= 0.0 && bedCur <= 0.0) {
+          st = 'offline';
+        } else if (!st) {
+          st = 'online';
+        }
+      }
       setPrinterStatus(st);
 
       // Microclimate query params
@@ -1300,10 +1325,11 @@
     if (!Boolean(window.Telegram?.WebApp?.initData) && !Boolean(window.maxBridge)) {
       async function pollLocalMoonraker() {
         try {
-          const resp = await fetch('http://127.0.0.1:7125/printer/objects/query?print_stats&display_status&extruder&heater_bed&toolhead', { cache: 'no-store' });
+          const resp = await fetch('http://127.0.0.1:7125/printer/objects/query?webhooks&print_stats&display_status&extruder&heater_bed&toolhead', { cache: 'no-store' });
           if (resp.ok) {
             const data = await resp.json();
             const st = data?.result?.status || {};
+            const wh = st.webhooks || {};
             const ext = st.extruder || {};
             const bed = st.heater_bed || {};
             const ps = st.print_stats || {};
@@ -1314,7 +1340,21 @@
             const bCur = bed.temperature || 0;
             const bTar = bed.target || 0;
             const progress = Math.round((ds.progress || 0) * 100);
-            const state = ps.state || 'standby';
+
+            const whState = (wh.state || '').toLowerCase();
+            const whMsg = (wh.state_message || '').toLowerCase();
+
+            let finalState = 'online';
+            if (whState === 'error' || whState === 'shutdown' || whState === 'disconnected' || (hCur <= 0 && bCur <= 0)) {
+              if (whMsg.includes('mcu') || whMsg.includes('connect') || (hCur <= 0 && bCur <= 0)) {
+                finalState = 'offline';
+              } else {
+                finalState = 'disconnected';
+              }
+            } else if (whState === 'ready') {
+              const pState = ps.state || 'standby';
+              finalState = pState;
+            }
 
             document.getElementById('hotendTemp').innerHTML = `${hCur.toFixed(1)}<span class="text-xs font-normal text-slate-400">°C</span>`;
             document.getElementById('hotendTarget').innerText = `/ ${Math.round(hTar)}°C`;
@@ -1331,12 +1371,14 @@
               document.getElementById('currentFile').innerText = ps.filename;
             }
 
-            setPrinterStatus(state);
+            setPrinterStatus(finalState);
             updateThermalEffects('hotend', hCur, hTar);
             updateThermalEffects('bed', bCur, bTar);
+          } else {
+            setPrinterStatus('offline');
           }
         } catch (e) {
-          // If Moonraker offline or loading
+          setPrinterStatus('offline');
         }
       }
       setInterval(pollLocalMoonraker, 1500);
