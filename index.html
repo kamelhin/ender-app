@@ -815,18 +815,87 @@
       sendCommand(isNozzle ? (isOn ? 'LIGHT_NOZZLE_ON' : 'LIGHT_NOZZLE_OFF') : (isOn ? 'LIGHT_FRAME_ON' : 'LIGHT_FRAME_OFF'));
     }
 
-    // Send command to bot
+    // Local Moonraker Direct Execution (for Redmi standalone screen)
+    const MOONRAKER_LOCAL = 'http://127.0.0.1:7125';
+
+    async function executeMoonrakerDirect(cmd, params = {}) {
+      try {
+        if (cmd === 'PAUSE') {
+          await fetch(`${MOONRAKER_LOCAL}/printer/print/pause`, { method: 'POST' });
+        } else if (cmd === 'RESUME') {
+          await fetch(`${MOONRAKER_LOCAL}/printer/print/resume`, { method: 'POST' });
+        } else if (cmd === 'CANCEL') {
+          await fetch(`${MOONRAKER_LOCAL}/printer/print/cancel`, { method: 'POST' });
+        } else if (cmd === 'START_PRINT' && params.filename) {
+          await fetch(`${MOONRAKER_LOCAL}/printer/print/start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: params.filename })
+          });
+          switchTab('dashboard');
+        } else {
+          let gcode = '';
+          if (cmd === 'PREHEAT_PLA') gcode = 'PREHEAT_PLA';
+          else if (cmd === 'PREHEAT_PETG') gcode = 'PREHEAT_PETG';
+          else if (cmd === 'PREHEAT_STANDBY') gcode = 'PREHEAT_STANDBY';
+          else if (cmd === 'COOLDOWN') gcode = 'COOLDOWN';
+          else if (cmd === 'PREPARE_BED') gcode = 'PREPARE_BED';
+          else if (cmd === 'SCREWS_LEVELING') gcode = 'SCREWS_LEVELING';
+          else if (cmd === 'LOAD_FILAMENT') gcode = 'LOAD_FILAMENT';
+          else if (cmd === 'UNLOAD_FILAMENT') gcode = 'UNLOAD_FILAMENT';
+          else if (cmd === 'DRY_FILAMENT') gcode = 'M140 S65';
+          else if (cmd === 'SERVICE_PARK') gcode = 'G28\nG1 Z200 F1500\nG1 Y290 F3000';
+          else if (cmd === 'MOTORS_OFF') gcode = 'M84';
+          else if (cmd === 'NIGHT_MODE') gcode = 'M220 S50\nSET_VELOCITY_LIMIT ACCEL=1000';
+          else if (cmd === 'DAY_MODE') gcode = 'M220 S100\nSET_VELOCITY_LIMIT ACCEL=3000';
+          else if (cmd === 'SONG_STAR_WARS') gcode = 'M300 S440 P500\nM300 S440 P500\nM300 S440 P500\nM300 S349 P350\nM300 S523 P150\nM300 S440 P500\nM300 S349 P350\nM300 S523 P150\nM300 S440 P1000';
+          else if (cmd === 'SONG_MARIO') gcode = 'M300 S660 P100\nM300 S660 P100\nM300 S0 P100\nM300 S660 P100\nM300 S0 P100\nM300 S510 P100\nM300 S660 P100\nM300 S0 P100\nM300 S770 P100';
+          else if (cmd === 'TUNE_SPEED_80') gcode = 'M220 S80';
+          else if (cmd === 'TUNE_SPEED_100') gcode = 'M220 S100';
+          else if (cmd === 'TUNE_SPEED_120') gcode = 'M220 S120';
+          else if (cmd === 'TUNE_Z_DOWN') gcode = 'SET_GCODE_OFFSET Z_ADJUST=-0.02 MOVE=1';
+          else if (cmd === 'TUNE_Z_UP') gcode = 'SET_GCODE_OFFSET Z_ADJUST=+0.02 MOVE=1';
+          else if (cmd === 'TUNE_FAN_0') gcode = 'M106 S0';
+          else if (cmd === 'TUNE_FAN_128') gcode = 'M106 S128';
+          else if (cmd === 'TUNE_FAN_255') gcode = 'M106 S255';
+          else if (cmd === 'LIGHT_NOZZLE_ON') gcode = 'SET_PIN PIN=led_nozzle VALUE=1';
+          else if (cmd === 'LIGHT_NOZZLE_OFF') gcode = 'SET_PIN PIN=led_nozzle VALUE=0';
+          else if (cmd === 'LIGHT_FRAME_ON') gcode = 'SET_PIN PIN=led_frame VALUE=1';
+          else if (cmd === 'LIGHT_FRAME_OFF') gcode = 'SET_PIN PIN=led_frame VALUE=0';
+          else if (cmd === 'SAFE_POWER_OFF') gcode = 'SAFE_POWER_OFF';
+          else if (cmd === 'FIRMWARE_RESTART') {
+            await fetch(`${MOONRAKER_LOCAL}/printer/firmware_restart`, { method: 'POST' });
+            return;
+          }
+
+          if (gcode) {
+            await fetch(`${MOONRAKER_LOCAL}/printer/gcode/script`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ script: gcode })
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('Direct Moonraker execution notice:', err);
+      }
+    }
+
+    // Send command router: Telegram -> MAX -> Direct Moonraker (Redmi Standalone)
     function sendCommand(cmd, params = {}) {
       triggerHaptic('medium');
       const payload = { cmd: cmd, ...params };
 
-      if (tg && tg.sendData) {
-        tg.sendData(JSON.stringify(payload));
-      } else if (maxBridge && maxBridge.sendData) {
-        maxBridge.sendData(JSON.stringify(payload));
+      const isTg = Boolean(window.Telegram?.WebApp?.initData);
+      const isMax = Boolean(window.maxBridge);
+
+      if (isTg && window.Telegram.WebApp.sendData) {
+        window.Telegram.WebApp.sendData(JSON.stringify(payload));
+      } else if (isMax && window.maxBridge.sendData) {
+        window.maxBridge.sendData(JSON.stringify(payload));
       } else {
-        console.log('Command sent:', payload);
-        alert('Команда отправлена: ' + cmd + (params.filename ? ' (' + params.filename + ')' : ''));
+        // Direct Autonomous Mode on Redmi Phone!
+        executeMoonrakerDirect(cmd, params);
       }
     }
 
@@ -1226,6 +1295,53 @@
 
     parseParams();
     loadFilesCatalog();
+
+    // Autonomous 1-second live telemetry polling on Redmi screen (when running outside Telegram)
+    if (!Boolean(window.Telegram?.WebApp?.initData) && !Boolean(window.maxBridge)) {
+      async function pollLocalMoonraker() {
+        try {
+          const resp = await fetch('http://127.0.0.1:7125/printer/objects/query?print_stats&display_status&extruder&heater_bed&toolhead', { cache: 'no-store' });
+          if (resp.ok) {
+            const data = await resp.json();
+            const st = data?.result?.status || {};
+            const ext = st.extruder || {};
+            const bed = st.heater_bed || {};
+            const ps = st.print_stats || {};
+            const ds = st.display_status || {};
+
+            const hCur = ext.temperature || 0;
+            const hTar = ext.target || 0;
+            const bCur = bed.temperature || 0;
+            const bTar = bed.target || 0;
+            const progress = Math.round((ds.progress || 0) * 100);
+            const state = ps.state || 'standby';
+
+            document.getElementById('hotendTemp').innerHTML = `${hCur.toFixed(1)}<span class="text-xs font-normal text-slate-400">°C</span>`;
+            document.getElementById('hotendTarget').innerText = `/ ${Math.round(hTar)}°C`;
+            document.getElementById('hotendBar').style.width = Math.min(100, (hCur / 260) * 100) + '%';
+
+            document.getElementById('bedTemp').innerHTML = `${bCur.toFixed(1)}<span class="text-xs font-normal text-slate-400">°C</span>`;
+            document.getElementById('bedTarget').innerText = `/ ${Math.round(bTar)}°C`;
+            document.getElementById('bedBar').style.width = Math.min(100, (bCur / 100) * 100) + '%';
+
+            document.getElementById('printPercent').innerText = `${progress}%`;
+            document.getElementById('mainProgress').style.width = `${progress}%`;
+
+            if (ps.filename) {
+              document.getElementById('currentFile').innerText = ps.filename;
+            }
+
+            setPrinterStatus(state);
+            updateThermalEffects('hotend', hCur, hTar);
+            updateThermalEffects('bed', bCur, bTar);
+          }
+        } catch (e) {
+          // If Moonraker offline or loading
+        }
+      }
+      setInterval(pollLocalMoonraker, 1500);
+      pollLocalMoonraker();
+    }
   </script>
 </body>
 </html>
