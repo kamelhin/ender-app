@@ -168,6 +168,32 @@
       background: linear-gradient(145deg, rgba(8, 30, 45, 0.85) 0%, rgba(19, 29, 46, 0.95) 100%) !important;
     }
 
+  
+    /* Sleek Floating Toast Notification */
+    #toastBox {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: rgba(17, 24, 39, 0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #10b981;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(16, 185, 129, 0.25);
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #toastBox.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
   </style>
 </head>
 <body class="p-3.5 pb-24 max-w-md mx-auto min-h-screen flex flex-col justify-between">
@@ -881,35 +907,62 @@
       }
     }
 
-    // Send command router: Telegram -> MAX -> Direct Moonraker (Redmi Standalone)
-    function sendCommand(cmd, params = {}) {
+    const NTFY_TOPIC = 'myender_kamelhin_cmd_82737';
+
+    function showToast(text, isError = false) {
+      const toast = document.getElementById('toastBox');
+      if (!toast) return;
+      toast.innerText = text;
+      toast.style.borderColor = isError ? 'rgba(239, 68, 68, 0.5)' : 'rgba(16, 185, 129, 0.4)';
+      toast.style.color = isError ? '#f87171' : '#10b981';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    // High-speed In-App Command Router (Never closes or kicks out of the Mini App!)
+    async function sendCommand(cmd, params = {}) {
       triggerHaptic('medium');
       const payload = { cmd: cmd, ...params };
 
-      const isTg = Boolean(window.Telegram?.WebApp?.initData);
-      const isMax = Boolean(window.maxBridge);
+      // Map friendly labels for in-app feedback
+      const labels = {
+        'PREHEAT_PLA': '🌱 Прогрев PLA (200°/60°)',
+        'PREHEAT_PETG': '🔥 Прогрев PETG (230°/78°)',
+        'PREHEAT_STANDBY': '🛋 Дежурный прогрев',
+        'COOLDOWN': '❄️ Охлаждение',
+        'PAUSE': '⏸ Печать на паузе',
+        'RESUME': '▶️ Печать возобновлена',
+        'CANCEL': '⏹ Печать отменена',
+        'PREPARE_BED': '🧽 Стол выдвинут',
+        'SCREWS_LEVELING': '📐 Замер винтов',
+        'SERVICE_PARK': '🚀 Сервисная парковка',
+        'MOTORS_OFF': '🔓 Моторы отключены',
+        'NIGHT_MODE': '🌙 Ночной режим',
+        'DAY_MODE': '☀️ Дневной режим',
+        'SONG_STAR_WARS': '🎵 Star Wars',
+        'SONG_MARIO': '🍄 Super Mario',
+        'SAFE_POWER_OFF': '⚡ Безопасное выключение',
+        'LIGHT_NOZZLE_ON': '💡 Подсветка сопла: ВКЛ',
+        'LIGHT_NOZZLE_OFF': '🌑 Подсветка сопла: ВЫКЛ',
+        'LIGHT_FRAME_ON': '💡 Подсветка стола: ВКЛ',
+        'LIGHT_FRAME_OFF': '🌑 Подсветка стола: ВЫКЛ',
+      };
 
-      if (isTg && window.Telegram?.WebApp) {
-        // 1. SendData (works when opened via bottom Keyboard button)
-        try {
-          window.Telegram.WebApp.sendData(JSON.stringify(payload));
-        } catch (e) {
-          console.warn('sendData notice:', e);
-        }
+      showToast(labels[cmd] || `⚡ ${cmd}`);
 
-        // 2. Direct deep link fallback (works 100% when opened from MenuButton / InlineButton)
-        setTimeout(() => {
-          if (window.Telegram?.WebApp?.openTelegramLink) {
-            const cleanCmd = cmd.toLowerCase();
-            window.Telegram.WebApp.openTelegramLink(`https://t.me/myender_bot?start=${cleanCmd}`);
-          }
-        }, 80);
-      } else if (isMax && window.maxBridge?.sendData) {
-        window.maxBridge.sendData(JSON.stringify(payload));
-      } else {
-        // Direct Autonomous Mode on local Wi-Fi / Redmi Phone
+      // 1. Direct Background HTTP POST via ntfy relay (stays inside Mini App, 0.1s response)
+      try {
+        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+          method: 'POST',
+          headers: { 'Title': 'MiniApp Command' },
+          body: JSON.stringify(payload)
+        }).catch(() => {});
+      } catch (e) {}
+
+      // 2. Also try direct Moonraker execution if on local Wi-Fi
+      try {
         executeMoonrakerDirect(cmd, params);
-      }
+      } catch (e) {}
     }
 
     function confirmCancel() {
