@@ -243,12 +243,13 @@
       
       <!-- Live Print Card -->
       <div class="bg-surface rounded-2xl p-4 border border-surfaceBorder mb-3.5 shadow-lg relative overflow-hidden">
-        <div class="flex justify-between items-start mb-2.5">
-          <div class="truncate pr-2">
+        <div class="flex items-center gap-2.5 mb-2.5">
+          <img id="activeModelThumb" src="" alt="3D" class="w-12 h-12 rounded-xl object-contain bg-slate-950 p-1 border border-surfaceBorder shrink-0 hidden shadow-md">
+          <div class="flex-1 truncate pr-1">
             <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5" id="printStateBadge">Режим ожидания</span>
-            <h2 class="text-xs font-bold text-white truncate max-w-[210px]" id="currentFile">Файл не выбран</h2>
+            <h2 class="text-xs font-bold text-white truncate max-w-[190px]" id="currentFile">Файл не выбран</h2>
           </div>
-          <span class="text-xl font-black font-mono text-emerald-400" id="printPercent">0%</span>
+          <span class="text-xl font-black font-mono text-emerald-400 shrink-0" id="printPercent">0%</span>
         </div>
 
         <!-- Progress Bar -->
@@ -376,10 +377,28 @@
 
           <button onclick="toggleLight('frame')" id="btnLightFrame" class="p-2.5 rounded-xl border border-surfaceBorder bg-slate-900/60 hover:bg-surfaceHover flex items-center justify-between btn-tactile">
             <div class="text-left">
-              <p class="text-[11px] font-bold text-slate-200">💡 Рама (Верхний профиль)</p>
+              <p class="text-[11px] font-bold text-slate-200">💡 Стол (Верх/Рама)</p>
               <p class="text-[9px] text-slate-500" id="lightFrameStatus">Выключено</p>
             </div>
             <div class="w-2.5 h-2.5 rounded-full bg-slate-700" id="lightFrameDot"></div>
+          </button>
+        </div>
+
+        <!-- TV Backlight Ambient Indicator Widget -->
+        <div class="mt-2 pt-2 border-t border-surfaceBorder/60">
+          <button onclick="toggleTVNotify()" id="btnLightTV" class="w-full p-2.5 rounded-xl border border-surfaceBorder bg-slate-900/60 hover:bg-surfaceHover flex items-center justify-between btn-tactile">
+            <div class="flex items-center gap-2.5 text-left">
+              <div class="w-3.5 h-3.5 rounded-full bg-emerald-600 shadow-[0_0_8px_#059669] shrink-0" id="tvStripColorDot"></div>
+              <div>
+                <p class="text-[11px] font-bold text-slate-200 flex items-center gap-1.5">
+                  📺 Подсветка ТВ (Индикация статуса)
+                </p>
+                <p class="text-[9px] text-slate-400" id="tvStripSub">Яндекс IoT • Эмбиент-лента</p>
+              </div>
+            </div>
+            <span id="tvStripBadge" class="text-[9px] font-mono font-bold text-emerald-400 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+              🟢 Зелёный 30% (Ожидание)
+            </span>
           </button>
         </div>
       </div>
@@ -819,6 +838,12 @@
 
     // Light toggles (Dual Zone)
     let lightState = { nozzle: false, frame: false };
+    function toggleTVNotify() {
+      triggerHaptic('medium');
+      sendCommand('TOGGLE_TV_NOTIFY');
+      showToast('📺 ТВ Индикация переключена');
+    }
+
     function toggleLight(zone) {
       triggerHaptic('medium');
       lightState[zone] = !lightState[zone];
@@ -1059,6 +1084,34 @@
       const connSubtitle = document.getElementById('connSubtitle');
 
       const s = (statusType || 'online').toLowerCase();
+
+      // Update TV Backlight ambient indicator state
+      const tvDot = document.getElementById('tvStripColorDot');
+      const tvBadge = document.getElementById('tvStripBadge');
+      if (tvDot && tvBadge) {
+        if (s === 'offline' || s === 'power_off' || s === 'off') {
+          tvDot.className = 'w-3.5 h-3.5 rounded-full bg-rose-500 shadow-[0_0_12px_#ef4444]';
+          tvBadge.className = 'text-[9px] font-mono font-bold text-rose-400 px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/30';
+          tvBadge.innerText = '🔴 Красный 100% (Нет связи)';
+        } else if (s === 'disconnected' || s === 'error' || s === 'shutdown') {
+          tvDot.className = 'w-3.5 h-3.5 rounded-full bg-amber-500 shadow-[0_0_12px_#f59e0b]';
+          tvBadge.className = 'text-[9px] font-mono font-bold text-amber-400 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30';
+          tvBadge.innerText = '🟠 Оранжевый (Ошибка связи)';
+        } else if (s === 'printing') {
+          tvDot.className = 'w-3.5 h-3.5 rounded-full bg-cyan-400 shadow-[0_0_12px_#06b6d4] animate-pulse';
+          tvBadge.className = 'text-[9px] font-mono font-bold text-cyan-400 px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30';
+          tvBadge.innerText = '🔵 Голубой (Прогресс)';
+        } else if (s === 'ready' || s === 'online') {
+          tvDot.className = 'w-3.5 h-3.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#10b981]';
+          tvBadge.className = 'text-[9px] font-mono font-bold text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30';
+          tvBadge.innerText = '🟢 Зелёный 50% (В сети)';
+        } else {
+          // standby
+          tvDot.className = 'w-3.5 h-3.5 rounded-full bg-emerald-600 shadow-[0_0_8px_#059669]';
+          tvBadge.className = 'text-[9px] font-mono font-bold text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30';
+          tvBadge.innerText = '🟢 Зелёный 30% (Ожидание)';
+        }
+      }
 
       if (s === 'offline' || s === 'power_off' || s === 'off') {
         // 🔴 ВЫКЛЮЧЕН
@@ -1384,6 +1437,24 @@
           `;
         });
         container.innerHTML = html;
+
+        // Auto-link active model thumbnail in Dashboard
+        const curFileEl = document.getElementById('currentFile');
+        const curName = (curFileEl?.innerText || '').trim();
+        const activeThumb = document.getElementById('activeModelThumb');
+        if (activeThumb) {
+          let match = files.find(f => curName && curName !== 'Файл не выбран' && (f.filename === curName || curName.includes(f.displayName) || f.displayName.includes(curName)));
+          if (!match && files.length > 0) {
+            match = files[0];
+          }
+          if (match && match.thumbnail) {
+            activeThumb.src = match.thumbnail;
+            activeThumb.classList.remove('hidden');
+            if (!curName || curName === 'Файл не выбран') {
+              if (curFileEl) curFileEl.innerText = match.displayName || match.filename;
+            }
+          }
+        }
       } catch (err) {
         console.error('Catalog load error:', err);
         container.innerHTML = `
