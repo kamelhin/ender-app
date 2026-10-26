@@ -1,49 +1,45 @@
 {
-  "updated_at": 1792968739,
+  "updated_at": 1793053413,
   "climate": {
-    "temp": 27.0,
+    "temp": 26.9,
     "humidity": 28.0,
     "note": "сухо, супер для PETG ✨",
     "name": "ИК пульт с датчиком"
   },
   "printer": {
     "connection": "online",
-    "state": "standby",
-    "hotend": 0.0,
+    "state": "ready",
+    "hotend": 28.8,
     "hotend_target": 0.0,
-    "bed": 0.0,
+    "bed": 27.4,
     "bed_target": 0.0
   },
   "files": [
     {
-      "id": 0,
-      "filename": "Untitled v1_PETG_30m23s.gcode",
-      "displayName": "Untitled v1_PETG_30m23s",
-      "sizeMb": 2.72,
-      "time": "30м  23с",
-      "filamentWeight": "6.2 г",
-      "filamentLength": "2.1 м",
-      "material": "PETG",
-      "layerHeight": "0.20 мм",
-      "totalLayers": "90 сл.",
-      "bedTemp": "78",
-      "nozzleTemp": "245",
-      "thumbnail": "thumbnails/thumb_untitled_v1_petg_30m23s.png"
-    },
-    {
       "id": 1,
       "filename": "obj_1_SPATULE V2.STL_PETG_46m6s.gcode",
-      "displayName": "SPATULE V2_PETG_46m6s",
+      "displayName": "SPATULE V2 (Шпатель)",
       "sizeMb": 3.13,
-      "time": "46м  6с",
-      "filamentWeight": "13.6 г",
-      "filamentLength": "4.5 м",
+      "time": "46м 06с",
+      "filamentWeight": "16.8г",
       "material": "PETG",
-      "layerHeight": "0.20 мм",
-      "totalLayers": "37 сл.",
-      "bedTemp": "78",
-      "nozzleTemp": "245",
-      "thumbnail": "thumbnails/thumb_spatule_v2_petg_46m6s.png"
+      "totalLayers": 210,
+      "nozzleTemp": 230,
+      "bedTemp": 78,
+      "thumbnail": ""
+    },
+    {
+      "id": 2,
+      "filename": "Untitled v1_PETG_30m23s.gcode",
+      "displayName": "Untitled v1",
+      "sizeMb": 2.72,
+      "time": "30м 23с",
+      "filamentWeight": "12.4г",
+      "material": "PETG",
+      "totalLayers": 150,
+      "nozzleTemp": 230,
+      "bedTemp": 78,
+      "thumbnail": ""
     }
   ]
 }
