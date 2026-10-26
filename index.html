@@ -889,12 +889,25 @@
       const isTg = Boolean(window.Telegram?.WebApp?.initData);
       const isMax = Boolean(window.maxBridge);
 
-      if (isTg && window.Telegram.WebApp.sendData) {
-        window.Telegram.WebApp.sendData(JSON.stringify(payload));
-      } else if (isMax && window.maxBridge.sendData) {
+      if (isTg && window.Telegram?.WebApp) {
+        // 1. SendData (works when opened via bottom Keyboard button)
+        try {
+          window.Telegram.WebApp.sendData(JSON.stringify(payload));
+        } catch (e) {
+          console.warn('sendData notice:', e);
+        }
+
+        // 2. Direct deep link fallback (works 100% when opened from MenuButton / InlineButton)
+        setTimeout(() => {
+          if (window.Telegram?.WebApp?.openTelegramLink) {
+            const cleanCmd = cmd.toLowerCase();
+            window.Telegram.WebApp.openTelegramLink(`https://t.me/myender_bot?start=${cleanCmd}`);
+          }
+        }, 80);
+      } else if (isMax && window.maxBridge?.sendData) {
         window.maxBridge.sendData(JSON.stringify(payload));
       } else {
-        // Direct Autonomous Mode on Redmi Phone!
+        // Direct Autonomous Mode on local Wi-Fi / Redmi Phone
         executeMoonrakerDirect(cmd, params);
       }
     }
@@ -1202,6 +1215,30 @@
         const ql = parseInt(p.get('queue_len'));
         if (ql > 0) {
           document.getElementById('queueStatusText').innerText = `В очереди ожидает ${ql} файл(ов). Готов к автозапуску.`;
+        }
+      }
+
+      // Lights sync from URL
+      if (p.has('light_nozzle')) {
+        const isOn = (p.get('light_nozzle') === '1' || p.get('light_nozzle') === 'true');
+        lightState.nozzle = isOn;
+        const dot = document.getElementById('lightNozzleDot');
+        const status = document.getElementById('lightNozzleStatus');
+        if (dot && status) {
+          dot.className = isOn ? 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]' : 'w-2.5 h-2.5 rounded-full bg-slate-700';
+          status.innerText = isOn ? 'Включено' : 'Выключено';
+          status.className = isOn ? 'text-[9px] text-emerald-400 font-bold' : 'text-[9px] text-slate-500';
+        }
+      }
+      if (p.has('light_frame')) {
+        const isOn = (p.get('light_frame') === '1' || p.get('light_frame') === 'true');
+        lightState.frame = isOn;
+        const dot = document.getElementById('lightFrameDot');
+        const status = document.getElementById('lightFrameStatus');
+        if (dot && status) {
+          dot.className = isOn ? 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]' : 'w-2.5 h-2.5 rounded-full bg-slate-700';
+          status.innerText = isOn ? 'Включено' : 'Выключено';
+          status.className = isOn ? 'text-[9px] text-emerald-400 font-bold' : 'text-[9px] text-slate-500';
         }
       }
     }
