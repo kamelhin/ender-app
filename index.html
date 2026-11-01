@@ -17,15 +17,16 @@
       theme: {
         extend: {
           colors: {
-            obsidian: '#080c14',
-            surface: '#111827',
-            surfaceHover: '#1f293d',
-            surfaceBorder: '#1f2937',
-            cardBg: '#131d2e',
+            obsidian: '#06090e',
+            surface: '#0c1322',
+            surfaceCard: '#111a2e',
+            surfaceHover: '#18243e',
+            surfaceBorder: 'rgba(255, 255, 255, 0.08)',
             accent: '#10b981', // Emerald
             cyanGlow: '#06b6d4',
             warning: '#f59e0b',
             danger: '#ef4444',
+            violetAcc: '#8b5cf6',
           }
         }
       }
@@ -33,20 +34,32 @@
   </script>
 
   <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    
     body {
-      background-color: #080c14;
+      background-color: #06090e;
       color: #f1f5f9;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
+      padding-top: max(12px, var(--safe-top));
+      padding-bottom: max(88px, calc(var(--safe-bottom) + 72px));
     }
     
-    .glow-emerald { box-shadow: 0 0 25px rgba(16, 185, 129, 0.2); }
-    .glow-orange { box-shadow: 0 0 25px rgba(249, 115, 22, 0.2); }
-    .glow-cyan { box-shadow: 0 0 25px rgba(6, 182, 212, 0.2); }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
     
     .btn-tactile {
+      min-height: 44px;
       transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
     }
     .btn-tactile:active {
       transform: scale(0.96);
@@ -60,38 +73,31 @@
     .stripes-active {
       background-image: linear-gradient(
         45deg,
-        rgba(255, 255, 255, 0.15) 25%,
+        rgba(255, 255, 255, 0.2) 25%,
         transparent 25%,
         transparent 50%,
-        rgba(255, 255, 255, 0.15) 50%,
-        rgba(255, 255, 255, 0.15) 75%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.2) 75%,
         transparent 75%,
         transparent
       );
       background-size: 36px 36px;
-      animation: move-stripes 2s linear infinite;
+      animation: move-stripes 1.8s linear infinite;
     }
 
     .tab-content { display: none; }
-    .tab-content.active { display: block; animation: fadeIn 0.15s ease-out; }
+    .tab-content.active { display: block; animation: fadeIn 0.18s ease-out; }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
     
-    /* Custom scrollbar for library */
-    ::-webkit-scrollbar {
-      width: 4px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #080c14;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1f2937;
-      border-radius: 4px;
-    }
-  
-    /* Flame Flickering & Hearth Animation */
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #06090e; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+
+    /* Flame Animation */
     @keyframes flameFlicker {
       0%, 100% {
         transform: scale(1) translateY(0) rotate(-1deg);
@@ -127,26 +133,14 @@
     }
     .card-heating {
       animation: fireGlowCard 1.8s infinite ease-in-out !important;
-      background: linear-gradient(145deg, rgba(38, 18, 10, 0.85) 0%, rgba(19, 29, 46, 0.95) 100%) !important;
+      background: linear-gradient(145deg, rgba(38, 18, 10, 0.85) 0%, rgba(17, 26, 46, 0.95) 100%) !important;
     }
 
-    /* Cooling Wind Gust & Breeze Animation */
+    /* Cooling Breeze Animation */
     @keyframes windGust {
-      0% {
-        transform: translateX(-4px) scale(0.95);
-        opacity: 0.6;
-        filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.5));
-      }
-      50% {
-        transform: translateX(4px) scale(1.08);
-        opacity: 1;
-        filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.9));
-      }
-      100% {
-        transform: translateX(-4px) scale(0.95);
-        opacity: 0.6;
-        filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.5));
-      }
+      0% { transform: translateX(-3px) scale(0.96); opacity: 0.7; filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.5)); }
+      50% { transform: translateX(3px) scale(1.06); opacity: 1; filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.9)); }
+      100% { transform: translateX(-3px) scale(0.96); opacity: 0.7; filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.5)); }
     }
     .animate-breeze {
       animation: windGust 1.5s infinite ease-in-out;
@@ -165,25 +159,24 @@
     }
     .card-cooling {
       animation: coolGlowCard 2.2s infinite ease-in-out !important;
-      background: linear-gradient(145deg, rgba(8, 30, 45, 0.85) 0%, rgba(19, 29, 46, 0.95) 100%) !important;
+      background: linear-gradient(145deg, rgba(8, 30, 45, 0.85) 0%, rgba(17, 26, 46, 0.95) 100%) !important;
     }
 
-  
-    /* Sleek Floating Toast Notification */
+    /* Floating Toast */
     #toastBox {
       position: fixed;
-      top: 16px;
+      top: max(16px, env(safe-area-inset-top, 16px));
       left: 50%;
-      transform: translateX(-50%) translateY(-20px);
-      background: rgba(17, 24, 39, 0.92);
-      backdrop-filter: blur(12px);
+      transform: translateX(-50%) translateY(-24px);
+      background: rgba(12, 19, 34, 0.94);
+      backdrop-filter: blur(16px);
       border: 1px solid rgba(16, 185, 129, 0.4);
       color: #10b981;
-      padding: 8px 16px;
+      padding: 10px 20px;
       border-radius: 9999px;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(16, 185, 129, 0.25);
+      box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.6), 0 0 20px rgba(16, 185, 129, 0.2);
       z-index: 9999;
       opacity: 0;
       pointer-events: none;
@@ -194,607 +187,739 @@
       opacity: 1;
     }
 
+    /* Bottom Sheet Modal */
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease-out;
+    }
+    .sheet-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sheet-content {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 480px;
+      margin: 0 auto;
+      background: #0c1322;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px 24px 0 0;
+      padding: 20px;
+      padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
+      z-index: 1001;
+      transform: translateY(100%);
+      transition: transform 0.24s cubic-bezier(0.32, 0.72, 0, 1);
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+    }
+    .sheet-backdrop.show .sheet-content {
+      transform: translateY(0);
+    }
+
+    /* Dials rotation */
+    .screw-dial-indicator {
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-origin: 50% 50%;
+    }
   </style>
 </head>
-<body class="p-3.5 pb-24 max-w-md mx-auto min-h-screen flex flex-col justify-between">
+<body class="p-3.5 max-w-md mx-auto min-h-screen flex flex-col justify-between">
 
-  <!-- TOP HEADER -->
-  <div>
-    <header class="flex items-center justify-between pb-3 border-b border-surfaceBorder/80 mb-3.5">
-      <div class="flex items-center space-x-2.5">
-        <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_12px_#10b981]" id="statusDot"></div>
-        <div>
-          <h1 class="text-sm font-bold tracking-tight text-white flex items-center gap-1.5">
-            Ender-3 S1 Plus
-            <span class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Klipper</span>
-          </h1>
-          <p class="text-[11px] text-slate-400 font-medium" id="statusSub">Готов к печати</p>
-        </div>
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastBox">⚡ Команда отправлена</div>
+
+  <!-- TOP APP HEADER -->
+  <header class="flex items-center justify-between pb-3 border-b border-white/10 mb-3.5">
+    <div class="flex items-center space-x-2.5">
+      <div class="relative">
+        <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_14px_#10b981]" id="statusDot"></div>
+        <div class="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40"></div>
       </div>
-      
-      <div class="flex items-center gap-1.5">
-        <button onclick="refreshData()" class="p-2 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-300 btn-tactile">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="refreshIcon"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
-        </button>
+      <div>
+        <h1 class="text-sm font-black tracking-tight text-white flex items-center gap-1.5">
+          Ender-3 S1 Plus
+          <span class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Klipper</span>
+        </h1>
+        <p class="text-[11px] text-slate-400 font-medium" id="statusSub">Готов к печати</p>
       </div>
-    </header>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      <!-- Live Stream Pill -->
+      <div id="liveStreamBadge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-mono font-bold text-emerald-400">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#10b981]"></span>
+        <span id="liveStreamText">LIVE</span>
+        <span id="livePing" class="text-[9px] text-emerald-500/80">35ms</span>
+      </div>
+
+      <!-- Quick Reload -->
+      <button onclick="manualRefreshTelemetry()" class="p-2 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-300 btn-tactile" style="min-height:36px; min-width:36px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="refreshIcon"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN TAB WRAPPER -->
+  <main class="flex-1">
 
     <!-- ========================================================================= -->
-    <!-- TAB 1: ПУЛЬТ УПРАВЛЕНИЯ (COCKPIT / DASHBOARD) -->
+    <!-- TAB 1: ПУЛЬТ (COCKPIT / DASHBOARD) -->
     <!-- ========================================================================= -->
-    <div id="tab-dashboard" class="tab-content active">
+    <div id="tab-dashboard" class="tab-content active space-y-3.5">
 
-      <!-- Printer Connection & Power Status Banner -->
-      <div id="printerConnectionBanner" class="flex items-center justify-between p-2.5 px-3 rounded-2xl bg-surface border border-surfaceBorder mb-3.5 transition-all duration-300 shadow-md">
-        <div class="flex items-center gap-2.5">
-          <div id="connDot" class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_12px_#10b981]"></div>
-          <div>
-            <div class="flex items-center gap-1.5">
-              <span id="connTitle" class="text-xs font-black text-white tracking-wide">ОНЛАЙН</span>
-              <span id="connBadge" class="text-[9px] uppercase px-1.5 py-0.2 rounded font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">В сети</span>
-            </div>
-            <p id="connSubtitle" class="text-[10px] text-slate-400">Moonraker & Klipper активны</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <span id="connPulseTag" class="text-[9px] uppercase px-2.5 py-0.5 rounded-full font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Активен</span>
-        </div>
-      </div>
-      
       <!-- Live Print Card -->
-      <div class="bg-surface rounded-2xl p-4 border border-surfaceBorder mb-3.5 shadow-lg relative overflow-hidden">
-        <div class="flex items-center gap-2.5 mb-2.5">
-          <img id="activeModelThumb" src="" alt="3D" class="w-12 h-12 rounded-xl object-contain bg-slate-950 p-1 border border-surfaceBorder shrink-0 hidden shadow-md">
+      <div class="bg-surface rounded-2xl p-4 border border-surfaceBorder shadow-xl relative overflow-hidden">
+        <div class="flex items-center gap-3 mb-3">
+          <img id="activeModelThumb" src="" alt="3D" class="w-13 h-13 rounded-xl object-contain bg-black/60 p-1 border border-white/10 shrink-0 hidden shadow-md">
           <div class="flex-1 truncate pr-1">
             <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5" id="printStateBadge">Режим ожидания</span>
-            <h2 class="text-xs font-bold text-white truncate max-w-[190px]" id="currentFile">Файл не выбран</h2>
+            <h2 class="text-xs font-bold text-white truncate max-w-[210px]" id="currentFile">Файл не выбран</h2>
           </div>
-          <span class="text-xl font-black font-mono text-emerald-400 shrink-0" id="printPercent">0%</span>
+          <span class="text-2xl font-black font-mono tabular-nums text-emerald-400 shrink-0" id="printPercent">0%</span>
         </div>
 
-        <!-- Progress Bar -->
-        <div class="w-full bg-slate-950 rounded-full h-3 mb-2.5 p-0.5 border border-surfaceBorder overflow-hidden">
+        <!-- Animated Progress Bar -->
+        <div class="w-full bg-slate-950 rounded-full h-3 mb-2.5 p-0.5 border border-white/10 overflow-hidden">
           <div id="mainProgress" class="bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 h-full rounded-full stripes-active transition-all duration-300" style="width: 0%"></div>
         </div>
 
-        <div class="flex justify-between text-[11px] text-slate-400 mb-3">
-          <span id="layerInfo">Слой: 0 / 0</span>
-          <span id="timeLeft">Осталось: ~0 мин</span>
+        <!-- Telemetry Details Row -->
+        <div class="grid grid-cols-3 gap-2 text-[11px] tabular-nums text-slate-400 mb-3 bg-black/30 p-2 rounded-xl border border-white/5 text-center">
+          <div>
+            <span class="text-[9px] uppercase text-slate-500 block">Высота Z</span>
+            <span class="font-bold text-slate-200" id="currentZ">0.00 мм</span>
+          </div>
+          <div>
+            <span class="text-[9px] uppercase text-slate-500 block">Слой</span>
+            <span class="font-bold text-slate-200" id="layerInfo">0 / 0</span>
+          </div>
+          <div>
+            <span class="text-[9px] uppercase text-slate-500 block">Осталось</span>
+            <span class="font-bold text-emerald-400" id="timeLeft">~0 мин</span>
+          </div>
         </div>
 
-        <!-- Print Action Buttons -->
+        <!-- Print Primary Actions -->
         <div class="grid grid-cols-3 gap-2">
-          <button onclick="sendCommand('RESUME')" class="py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <button onclick="sendCommand('RESUME')" class="btn-tactile bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-bold gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             Старт
           </button>
-          <button onclick="sendCommand('PAUSE')" class="py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="4" height="16" x="6" y="4"/><rect width="4" height="16" x="14" y="4"/></svg>
+          <button onclick="sendCommand('PAUSE')" class="btn-tactile bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-400 rounded-xl text-xs font-bold gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="4" height="16" x="6" y="4"/><rect width="4" height="16" x="14" y="4"/></svg>
             Пауза
           </button>
-          <button onclick="confirmCancel()" class="py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="16" height="16" x="4" y="4" rx="2"/></svg>
+          <button onclick="openStopModal()" class="btn-tactile bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="16" height="16" x="4" y="4" rx="2"/></svg>
             Стоп
           </button>
         </div>
       </div>
 
-      <!-- Temperature Gauges Grid with Dynamic Fire 🔥 & Breeze 💨 Animations -->
-      <div class="grid grid-cols-2 gap-3 mb-3.5">
-        <!-- Hotend Extruder -->
-        <div id="hotendCard" class="bg-surface rounded-2xl p-3 border border-surfaceBorder transition-all duration-300 relative overflow-hidden">
+      <!-- Thermal Gauges Grid (Hotend & Bed) -->
+      <div class="grid grid-cols-2 gap-2.5">
+        <!-- Hotend Gauge -->
+        <div id="hotendCard" class="bg-surface rounded-2xl p-3 border border-surfaceBorder transition-all duration-300">
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-              <span id="hotendIconBox" class="inline-flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-orange-400"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+              <span id="hotendIconBox" class="flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-orange-400"><path d="m14 4-2 2-2-2"/><path d="m14 8-2 2-2-2"/><path d="m14 12-2 2-2-2"/><circle cx="12" cy="18" r="4"/></svg>
               </span>
               Сопло
             </span>
             <div class="flex items-center gap-1">
               <span id="hotendAnimBadge" class="hidden text-[8px] font-bold uppercase px-1.5 py-0.5 rounded"></span>
-              <span class="text-[10px] font-mono text-slate-500" id="hotendTarget">/ 0°C</span>
+              <span class="text-[10px] font-mono tabular-nums text-slate-500" id="hotendTarget">/ 0°C</span>
             </div>
           </div>
-          <div class="text-xl font-bold font-mono text-white mb-2" id="hotendTemp">
+          <div class="text-2xl font-black font-mono tabular-nums text-white mb-2" id="hotendTemp">
             0.0<span class="text-xs font-normal text-slate-400">°C</span>
           </div>
-          <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
-            <div id="hotendBar" class="bg-gradient-to-r from-amber-500 to-rose-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+          <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
+            <div id="hotendBar" class="bg-gradient-to-r from-orange-500 to-rose-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
           </div>
         </div>
 
-        <!-- Heated Bed -->
-        <div id="bedCard" class="bg-surface rounded-2xl p-3 border border-surfaceBorder transition-all duration-300 relative overflow-hidden">
+        <!-- Bed Gauge -->
+        <div id="bedCard" class="bg-surface rounded-2xl p-3 border border-surfaceBorder transition-all duration-300">
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-              <span id="bedIconBox" class="inline-flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan-400"><path d="M2 14h20M2 18h20M2 10h20"/></svg>
+            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+              <span id="bedIconBox" class="flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan-400"><path d="M2 12h20"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"/><path d="M4 6h16"/></svg>
               </span>
               Стол
             </span>
             <div class="flex items-center gap-1">
               <span id="bedAnimBadge" class="hidden text-[8px] font-bold uppercase px-1.5 py-0.5 rounded"></span>
-              <span class="text-[10px] font-mono text-slate-500" id="bedTarget">/ 0°C</span>
+              <span class="text-[10px] font-mono tabular-nums text-slate-500" id="bedTarget">/ 0°C</span>
             </div>
           </div>
-          <div class="text-xl font-bold font-mono text-white mb-2" id="bedTemp">
+          <div class="text-2xl font-black font-mono tabular-nums text-white mb-2" id="bedTemp">
             0.0<span class="text-xs font-normal text-slate-400">°C</span>
           </div>
-          <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+          <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
             <div id="bedBar" class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
           </div>
         </div>
       </div>
 
-      <!-- Quick Preheat Presets -->
-      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder mb-3.5">
+      <!-- Quick Preheat Presets (Touch targets >= 44px) -->
+      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder">
         <div class="flex items-center justify-between mb-2">
           <span class="text-xs font-bold text-white flex items-center gap-1.5">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-400"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             Прогрев стола и сопла
           </span>
-          <span class="text-[10px] text-slate-500">1 клик</span>
+          <span class="text-[10px] text-slate-500">1 тап</span>
         </div>
 
-        <div class="grid grid-cols-4 gap-1.5 text-[11px]">
-          <button onclick="sendCommand('PREHEAT_STANDBY')" class="p-2 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-center btn-tactile">
-            <p class="font-bold text-slate-200">Дежурный</p>
-            <p class="text-[9px] text-slate-400">50/140°</p>
+        <div class="grid grid-cols-4 gap-1.5">
+          <button onclick="sendCommand('PREHEAT_STANDBY')" class="btn-tactile flex-col py-2 px-1 bg-surfaceCard hover:bg-surfaceHover border border-white/5 rounded-xl text-center">
+            <p class="font-bold text-[11px] text-slate-200">Дежурный</p>
+            <p class="text-[9px] text-slate-400 tabular-nums">50/140°</p>
           </button>
-          <button onclick="sendCommand('PREHEAT_PLA')" class="p-2 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-center btn-tactile">
-            <p class="font-bold text-emerald-400">PLA</p>
-            <p class="text-[9px] text-slate-400">60/200°</p>
+          <button onclick="sendCommand('PREHEAT_PLA')" class="btn-tactile flex-col py-2 px-1 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-xl text-center">
+            <p class="font-bold text-[11px] text-emerald-400">PLA</p>
+            <p class="text-[9px] text-emerald-300/80 tabular-nums">60/200°</p>
           </button>
-          <button onclick="sendCommand('PREHEAT_PETG')" class="p-2 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-center btn-tactile">
-            <p class="font-bold text-orange-400">PETG</p>
-            <p class="text-[9px] text-slate-400">78/230°</p>
+          <button onclick="sendCommand('PREHEAT_PETG')" class="btn-tactile flex-col py-2 px-1 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 rounded-xl text-center">
+            <p class="font-bold text-[11px] text-orange-400">PETG</p>
+            <p class="text-[9px] text-orange-300/80 tabular-nums">78/230°</p>
           </button>
-          <button onclick="sendCommand('COOLDOWN')" class="p-2 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-center btn-tactile">
-            <p class="font-bold text-cyan-400">Остудить</p>
-            <p class="text-[9px] text-slate-400">0/0°</p>
+          <button onclick="sendCommand('COOLDOWN')" class="btn-tactile flex-col py-2 px-1 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 rounded-xl text-center">
+            <p class="font-bold text-[11px] text-cyan-400">Остудить</p>
+            <p class="text-[9px] text-cyan-300/80 tabular-nums">0/0°</p>
           </button>
         </div>
       </div>
 
-      <!-- Smart Light Control (Dual Zone 24V COB) -->
-      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder mb-3.5">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-bold text-white flex items-center gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-400"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-            Подсветка 24V COB (Wi-Fi реле)
-          </span>
-          <span class="text-[10px] font-mono text-slate-500">2 зоны</span>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="toggleLight('nozzle')" id="btnLightNozzle" class="p-2.5 rounded-xl border border-surfaceBorder bg-slate-900/60 hover:bg-surfaceHover flex items-center justify-between btn-tactile">
-            <div class="text-left">
-              <p class="text-[11px] font-bold text-slate-200">💡 Сопло (Z-балка)</p>
-              <p class="text-[9px] text-slate-500" id="lightNozzleStatus">Выключено</p>
-            </div>
+      <!-- Quick Toggles Row (Lights & 24V Smart Plug) -->
+      <div class="grid grid-cols-3 gap-2">
+        <!-- Light Nozzle -->
+        <button onclick="toggleLight('nozzle')" id="btnLightNozzle" class="btn-tactile flex-col p-2.5 rounded-xl border border-surfaceBorder bg-surfaceCard hover:bg-surfaceHover">
+          <div class="flex items-center gap-1.5 w-full justify-between">
+            <span class="text-[10px] font-bold text-slate-200">💡 Сопло</span>
             <div class="w-2.5 h-2.5 rounded-full bg-slate-700" id="lightNozzleDot"></div>
-          </button>
+          </div>
+          <span class="text-[9px] text-slate-500 mt-0.5 block w-full text-left" id="lightNozzleStatus">Выкл</span>
+        </button>
 
-          <button onclick="toggleLight('frame')" id="btnLightFrame" class="p-2.5 rounded-xl border border-surfaceBorder bg-slate-900/60 hover:bg-surfaceHover flex items-center justify-between btn-tactile">
-            <div class="text-left">
-              <p class="text-[11px] font-bold text-slate-200">💡 Стол (Верх/Рама)</p>
-              <p class="text-[9px] text-slate-500" id="lightFrameStatus">Выключено</p>
-            </div>
+        <!-- Light Bed Frame -->
+        <button onclick="toggleLight('frame')" id="btnLightFrame" class="btn-tactile flex-col p-2.5 rounded-xl border border-surfaceBorder bg-surfaceCard hover:bg-surfaceHover">
+          <div class="flex items-center gap-1.5 w-full justify-between">
+            <span class="text-[10px] font-bold text-slate-200">💡 Рама</span>
             <div class="w-2.5 h-2.5 rounded-full bg-slate-700" id="lightFrameDot"></div>
-          </button>
-        </div>
-
-        <!-- TV Backlight Ambient Indicator Widget -->
-        <div class="mt-2 pt-2 border-t border-surfaceBorder/60">
-          <button onclick="toggleTVNotify()" id="btnLightTV" class="w-full p-2.5 rounded-xl border border-surfaceBorder bg-slate-900/60 hover:bg-surfaceHover flex items-center justify-between btn-tactile">
-            <div class="flex items-center gap-2.5 text-left">
-              <div class="w-3.5 h-3.5 rounded-full bg-emerald-600 shadow-[0_0_8px_#059669] shrink-0" id="tvStripColorDot"></div>
-              <div>
-                <p class="text-[11px] font-bold text-slate-200 flex items-center gap-1.5">
-                  📺 Подсветка ТВ (Индикация статуса)
-                </p>
-                <p class="text-[9px] text-slate-400" id="tvStripSub">Яндекс IoT • Эмбиент-лента</p>
-              </div>
-            </div>
-            <span id="tvStripBadge" class="text-[9px] font-mono font-bold text-emerald-400 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
-              🟢 Зелёный 30% (Ожидание)
-            </span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Quick Tuning Bar -->
-      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder mb-3.5">
-        <p class="text-xs font-bold text-white mb-2 flex items-center gap-1.5">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan-400"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
-          Тюнинг параметров на лету
-        </p>
-        <div class="space-y-2 text-xs">
-          <!-- Speed -->
-          <div class="bg-slate-900/60 p-2 rounded-xl border border-surfaceBorder/60 flex items-center justify-between">
-            <span class="text-[11px] text-slate-400 flex items-center gap-1">⚡ Скорость печати:</span>
-            <div class="flex gap-1.5">
-              <button onclick="sendCommand('TUNE_SPEED_80')" class="px-2 py-1 bg-surfaceBorder hover:bg-slate-700 rounded text-[10px] text-slate-300 btn-tactile">🐢 80%</button>
-              <button onclick="sendCommand('TUNE_SPEED_100')" class="px-2 py-1 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 rounded text-[10px] font-bold btn-tactile">100%</button>
-              <button onclick="sendCommand('TUNE_SPEED_120')" class="px-2 py-1 bg-surfaceBorder hover:bg-slate-700 rounded text-[10px] text-slate-300 btn-tactile">🚀 120%</button>
-            </div>
           </div>
-          <!-- Z-Offset -->
-          <div class="bg-slate-900/60 p-2 rounded-xl border border-surfaceBorder/60 flex items-center justify-between">
-            <span class="text-[11px] text-slate-400 flex items-center gap-1">📏 BabyStepping Z:</span>
-            <div class="flex gap-1.5">
-              <button onclick="sendCommand('TUNE_Z_DOWN')" class="px-2 py-1 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded text-[10px] font-bold text-cyan-400 btn-tactile">⬇️ -0.02</button>
-              <button onclick="sendCommand('TUNE_Z_UP')" class="px-2 py-1 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 rounded text-[10px] font-bold text-orange-400 btn-tactile">⬆️ +0.02</button>
-            </div>
-          </div>
-          <!-- Fan Cooling -->
-          <div class="bg-slate-900/60 p-2 rounded-xl border border-surfaceBorder/60 flex items-center justify-between">
-            <span class="text-[11px] text-slate-400 flex items-center gap-1">💨 Обдув детали:</span>
-            <div class="flex gap-1.5">
-              <button onclick="sendCommand('TUNE_FAN_0')" class="px-2 py-1 bg-surfaceBorder hover:bg-slate-700 rounded text-[10px] text-slate-300 btn-tactile">0%</button>
-              <button onclick="sendCommand('TUNE_FAN_128')" class="px-2 py-1 bg-surfaceBorder hover:bg-slate-700 rounded text-[10px] text-slate-300 btn-tactile">50%</button>
-              <button onclick="sendCommand('TUNE_FAN_255')" class="px-2 py-1 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 rounded text-[10px] font-bold btn-tactile">100%</button>
-            </div>
-          </div>
-        </div>
-      </div>
+          <span class="text-[9px] text-slate-500 mt-0.5 block w-full text-left" id="lightFrameStatus">Выкл</span>
+        </button>
 
-      <!-- Room Climate Widget (Yandex Sensor) -->
-      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder mb-3.5 shadow-md">
-        <div class="flex items-center justify-between mb-1.5">
-          <span class="text-xs font-bold text-white flex items-center gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-400"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            Микроклимат комнаты (Яндекс)
-          </span>
-          <span class="text-[9px] text-emerald-400 font-bold" id="climateNote">сухо, супер для PETG ✨</span>
-        </div>
-        <div class="grid grid-cols-2 gap-2 text-center text-xs">
-          <div class="bg-slate-900/60 p-2 rounded-xl border border-surfaceBorder/60">
-            <p class="text-[10px] text-slate-400">Температура:</p>
-            <p class="text-base font-black font-mono text-white" id="climateTemp">27.0°C</p>
+        <!-- 24V Socket -->
+        <button onclick="togglePowerSocket()" id="btnPowerSocket" class="btn-tactile flex-col p-2.5 rounded-xl border border-surfaceBorder bg-surfaceCard hover:bg-surfaceHover">
+          <div class="flex items-center gap-1.5 w-full justify-between">
+            <span class="text-[10px] font-bold text-slate-200">🔌 Розетка</span>
+            <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]" id="socketDot"></div>
           </div>
-          <div class="bg-slate-900/60 p-2 rounded-xl border border-surfaceBorder/60">
-            <p class="text-[10px] text-slate-400">Влажность воздуха:</p>
-            <p class="text-base font-black font-mono text-cyan-400" id="climateHum">28%</p>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- TAB 2: ФАЙЛЫ И ОЧЕРЕДЬ (FILES & QUEUE) -->
-    <!-- ========================================================================= -->
-    <div id="tab-files" class="tab-content">
-      
-      <!-- Queue Section -->
-      <div class="bg-surface rounded-2xl p-3.5 border border-surfaceBorder mb-3.5">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-bold text-white flex items-center gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan-400"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
-            Очередь непрерывной печати
-          </span>
-          <button onclick="sendCommand('QUEUE_CLEAR')" class="text-[10px] text-rose-400 hover:underline">Очистить</button>
-        </div>
-        <p class="text-[11px] text-slate-400 mb-3" id="queueStatusText">В очереди пока нет файлов. Выберите модель ниже и нажмите «В очередь».</p>
-        
-        <button onclick="sendCommand('QUEUE_START_NEXT')" class="w-full py-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Запустить следующий из очереди
+          <span class="text-[9px] font-mono tabular-nums text-emerald-400 mt-0.5 block w-full text-left" id="socketPowerW">24V ВКЛ</span>
         </button>
       </div>
 
-      <!-- Models Library Header -->
-      <div class="flex items-center justify-between mb-2.5 px-0.5">
-        <p class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-400"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
-          Каталог моделей в памяти Klipper
-        </p>
-        <span class="text-[10px] text-slate-500" id="filesCountBadge">Загрузка...</span>
-      </div>
-
-      <!-- Models List Container -->
-      <div id="filesListContainer" class="space-y-3">
-        <!-- Loading Skeleton -->
-        <div class="bg-surface rounded-2xl p-4 border border-surfaceBorder animate-pulse text-center">
-          <p class="text-xs text-slate-400">Загрузка библиотеки файлов...</p>
+      <!-- Room Climate Widget -->
+      <div class="bg-surface rounded-2xl p-2.5 px-3.5 border border-surfaceBorder flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2">
+          <span class="text-base">🏠</span>
+          <span class="text-slate-300 font-medium">Климат в комнате:</span>
+        </div>
+        <div class="flex items-center gap-2 font-mono tabular-nums font-bold">
+          <span class="text-amber-400" id="climateTemp">--°C</span>
+          <span class="text-slate-600">•</span>
+          <span class="text-cyan-400" id="climateHum">--%</span>
         </div>
       </div>
 
     </div>
 
+
     <!-- ========================================================================= -->
-    <!-- TAB 3: СЕРВИС И КАЛИБРОВКА (SERVICE & TOOLS) -->
+    <!-- TAB 2: ОСИ И ТЮНИНГ (CONTROLS, JOGGING, TUNING) -->
     <!-- ========================================================================= -->
-    <div id="tab-service" class="tab-content">
-      
-      <!-- Emergency Resurrect Card -->
-      <div class="bg-surface rounded-2xl p-3.5 border border-amber-500/30 bg-amber-500/5 mb-3.5">
-        <div class="flex items-center gap-2.5 mb-2">
-          <div class="p-2 rounded-xl bg-amber-500/20 text-amber-400">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
-          </div>
-          <div>
-            <p class="text-xs font-bold text-white">Спасти прерванную печать (Resurrect)</p>
-            <p class="text-[10px] text-slate-400">Продолжение печати с точного слоя после отключения питания</p>
-          </div>
+    <div id="tab-controls" class="tab-content space-y-3.5">
+
+      <!-- Step Distance Selector -->
+      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-white flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan-400"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6Z"/></svg>
+            Шаг перемещения (мм)
+          </span>
+          <span class="text-[10px] text-cyan-400 font-mono font-bold" id="stepSelectedLabel">10 мм</span>
         </div>
-        <div class="grid grid-cols-2 gap-2 mt-2">
-          <button onclick="sendCommand('RESURRECT_AUTO')" class="py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-300 rounded-xl text-xs font-bold btn-tactile">
-            ⚡ Авто-спасение
+        <div class="grid grid-cols-4 gap-1.5">
+          <button onclick="setJogStep(0.1)" id="step-01" class="btn-tactile py-2 rounded-xl text-xs font-bold border border-white/5 bg-surfaceCard text-slate-300">0.1</button>
+          <button onclick="setJogStep(1.0)" id="step-1" class="btn-tactile py-2 rounded-xl text-xs font-bold border border-white/5 bg-surfaceCard text-slate-300">1.0</button>
+          <button onclick="setJogStep(10.0)" id="step-10" class="btn-tactile py-2 rounded-xl text-xs font-bold border border-cyan-500/40 bg-cyan-500/20 text-cyan-400">10</button>
+          <button onclick="setJogStep(50.0)" id="step-50" class="btn-tactile py-2 rounded-xl text-xs font-bold border border-white/5 bg-surfaceCard text-slate-300">50</button>
+        </div>
+      </div>
+
+      <!-- Jog Pad: XY Cross & Z Vertical -->
+      <div class="bg-surface rounded-2xl p-4 border border-surfaceBorder shadow-lg">
+        <span class="text-xs font-bold text-white block mb-3 flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-400"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg>
+            Управление осями (X / Y / Z)
+          </span>
+          <span class="text-[10px] text-slate-500">G91 Относительные</span>
+        </span>
+
+        <div class="grid grid-cols-3 gap-3 items-center justify-items-center max-w-[280px] mx-auto my-2">
+          <!-- Row 1 -->
+          <div></div>
+          <button onclick="jogMove('Y', 1)" class="btn-tactile w-16 h-16 rounded-2xl bg-surfaceCard hover:bg-surfaceHover border border-white/10 text-cyan-400 font-bold text-sm shadow-md flex-col gap-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m18 15-6-6-6 6"/></svg>
+            <span class="text-[10px] text-slate-300">Y+</span>
           </button>
-          <button onclick="sendCommand('RESURRECT_ASK_Z')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-surfaceBorder text-slate-200 rounded-xl text-xs font-bold btn-tactile">
-            ✏️ Ввести высоту Z
+          <button onclick="jogMove('Z', 1)" class="btn-tactile w-16 h-16 rounded-2xl bg-surfaceCard hover:bg-surfaceHover border border-cyan-500/20 text-cyan-400 font-bold text-sm shadow-md flex-col gap-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m18 15-6-6-6 6"/></svg>
+            <span class="text-[10px] text-cyan-300">Z+</span>
+          </button>
+
+          <!-- Row 2 -->
+          <button onclick="jogMove('X', -1)" class="btn-tactile w-16 h-16 rounded-2xl bg-surfaceCard hover:bg-surfaceHover border border-white/10 text-cyan-400 font-bold text-sm shadow-md flex-col gap-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+            <span class="text-[10px] text-slate-300">X-</span>
+          </button>
+          <button onclick="sendCommand('HOME_XY')" class="btn-tactile w-16 h-16 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-400 font-bold text-xs shadow-md flex-col gap-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="text-[9px]">XY</span>
+          </button>
+          <button onclick="jogMove('X', 1)" class="btn-tactile w-16 h-16 rounded-2xl bg-surfaceCard hover:bg-surfaceHover border border-white/10 text-cyan-400 font-bold text-sm shadow-md flex-col gap-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="text-[10px] text-slate-300">X+</span>
+          </button>
+
+          <!-- Row 3 -->
+          <div></div>
+          <button onclick="jogMove('Y', -1)" class="btn-tactile w-16 h-16 rounded-2xl bg-surfaceCard hover:bg-surfaceHover border border-white/10 text-cyan-400 font-bold text-sm shadow-md flex-col gap-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            <span class="text-[10px] text-slate-300">Y-</span>
+          </button>
+          <button onclick="jogMove('Z', -1)" class="btn-tactile w-16 h-16 rounded-2xl bg-surfaceCard hover:bg-surfaceHover border border-cyan-500/20 text-cyan-400 font-bold text-sm shadow-md flex-col gap-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            <span class="text-[10px] text-cyan-300">Z-</span>
+          </button>
+        </div>
+
+        <!-- Homing Row -->
+        <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/10">
+          <button onclick="sendCommand('HOME_ALL')" class="btn-tactile bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            Домой Все (G28)
+          </button>
+          <button onclick="sendCommand('HOME_Z')" class="btn-tactile bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 rounded-xl text-xs font-bold gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+            Калибровка Z (CR-Touch)
           </button>
         </div>
       </div>
 
-      <!-- CR-Touch 4-Corner Leveling with Circular Screw Dials (Крутилки со шкалой) -->
-      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder mb-3.5 shadow-md">
+      <!-- Extruder Manual Feed & Motors Off -->
+      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder">
+        <span class="text-xs font-bold text-white block mb-2 flex items-center justify-between">
+          <span>🧵 Экструдер и моторы</span>
+          <span class="text-[10px] text-slate-500">Только при T > 180°C</span>
+        </span>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="sendCommand('EXTRUDE', {dist: 10})" class="btn-tactile bg-surfaceCard hover:bg-surfaceHover border border-white/5 rounded-xl text-xs font-bold text-slate-200">
+            ⬇️ Подать 10мм
+          </button>
+          <button onclick="sendCommand('RETRACT', {dist: 10})" class="btn-tactile bg-surfaceCard hover:bg-surfaceHover border border-white/5 rounded-xl text-xs font-bold text-slate-200">
+            ⬆️ Откат 10мм
+          </button>
+          <button onclick="sendCommand('MOTORS_OFF')" class="btn-tactile bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 rounded-xl text-xs font-bold">
+            🔓 Моторы M84
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Tuning Widgets (Speed, Flow, Fan, Z-Offset) -->
+      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder space-y-3">
+        <span class="text-xs font-bold text-white flex items-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan-400"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
+          Тюнинг параметров на лету
+        </span>
+
+        <!-- Speed -->
+        <div class="bg-surfaceCard p-2.5 rounded-xl border border-white/5 flex items-center justify-between">
+          <span class="text-xs text-slate-300 font-medium">⚡ Скорость (M220):</span>
+          <div class="flex gap-1.5">
+            <button onclick="sendCommand('SET_SPEED', {value: 80})" class="btn-tactile px-2.5 py-1 rounded-lg text-xs font-bold bg-white/5 hover:bg-white/10 text-slate-300" style="min-height:36px;">80%</button>
+            <button onclick="sendCommand('SET_SPEED', {value: 100})" class="btn-tactile px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30" style="min-height:36px;">100%</button>
+            <button onclick="sendCommand('SET_SPEED', {value: 120})" class="btn-tactile px-2.5 py-1 rounded-lg text-xs font-bold bg-white/5 hover:bg-white/10 text-slate-300" style="min-height:36px;">120%</button>
+            <button onclick="sendCommand('SET_SPEED', {value: 150})" class="btn-tactile px-2.5 py-1 rounded-lg text-xs font-bold bg-white/5 hover:bg-white/10 text-slate-300" style="min-height:36px;">150%</button>
+          </div>
+        </div>
+
+        <!-- BabyStepping Z -->
+        <div class="bg-surfaceCard p-2.5 rounded-xl border border-white/5 flex items-center justify-between">
+          <span class="text-xs text-slate-300 font-medium">📏 BabyStepping Z:</span>
+          <div class="flex gap-1.5">
+            <button onclick="sendCommand('ADJUST_Z', {offset: -0.05})" class="btn-tactile px-2 py-1 rounded-lg text-xs font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30" style="min-height:36px;">-0.05</button>
+            <button onclick="sendCommand('ADJUST_Z', {offset: -0.02})" class="btn-tactile px-2 py-1 rounded-lg text-xs font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30" style="min-height:36px;">-0.02</button>
+            <button onclick="sendCommand('ADJUST_Z', {offset: +0.02})" class="btn-tactile px-2 py-1 rounded-lg text-xs font-bold bg-orange-500/15 text-orange-400 border border-orange-500/30" style="min-height:36px;">+0.02</button>
+            <button onclick="sendCommand('ADJUST_Z', {offset: +0.05})" class="btn-tactile px-2 py-1 rounded-lg text-xs font-bold bg-orange-500/15 text-orange-400 border border-orange-500/30" style="min-height:36px;">+0.05</button>
+          </div>
+        </div>
+
+        <!-- Fan Speed -->
+        <div class="bg-surfaceCard p-2.5 rounded-xl border border-white/5 flex items-center justify-between">
+          <span class="text-xs text-slate-300 font-medium">💨 Обдув детали:</span>
+          <div class="flex gap-1.5">
+            <button onclick="sendCommand('SET_FAN', {value: 0})" class="btn-tactile px-3 py-1 rounded-lg text-xs font-bold bg-white/5 hover:bg-white/10 text-slate-300" style="min-height:36px;">0%</button>
+            <button onclick="sendCommand('SET_FAN', {value: 128})" class="btn-tactile px-3 py-1 rounded-lg text-xs font-bold bg-white/5 hover:bg-white/10 text-slate-300" style="min-height:36px;">50%</button>
+            <button onclick="sendCommand('SET_FAN', {value: 255})" class="btn-tactile px-3 py-1 rounded-lg text-xs font-bold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30" style="min-height:36px;">100%</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: ФАЙЛЫ И ОЧЕРЕДЬ (FILES & QUEUE) -->
+    <!-- ========================================================================= -->
+    <div id="tab-files" class="tab-content space-y-3.5">
+
+      <div class="flex items-center justify-between px-1">
+        <div>
+          <h2 class="text-xs font-bold text-white uppercase tracking-wider">Библиотека G-code</h2>
+          <p class="text-[10px] text-slate-400">Реальные файлы и 3D превью на принтере</p>
+        </div>
+        <button onclick="loadFilesCatalog()" class="btn-tactile px-3 py-1.5 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-300 text-xs font-medium gap-1" style="min-height:36px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+          Обновить
+        </button>
+      </div>
+
+      <!-- Real Dynamic File List Container -->
+      <div id="filesContainer" class="space-y-2.5">
+        <div class="p-8 text-center text-slate-500 text-xs">
+          <div class="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+          Загрузка каталога моделей...
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ========================================================================= -->
+    <!-- TAB 4: СЕРВИС И УМНЫЙ ДОМ (SERVICE & SMART HOME) -->
+    <!-- ========================================================================= -->
+    <div id="tab-service" class="tab-content space-y-3.5">
+
+      <!-- 24V Smart Socket Cockpit -->
+      <div class="bg-surface rounded-2xl p-3.5 border border-surfaceBorder shadow-lg">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="p-2 rounded-xl bg-emerald-500/15 text-emerald-400">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 12h10"/><path d="M12 7v10"/></svg>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-white">Умная розетка 220V / 24V</p>
+              <p class="text-[10px] text-slate-400" id="smartSocketStatus">Питание принтера включено</p>
+            </div>
+          </div>
+          <button onclick="openPowerModal()" class="btn-tactile px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/30 text-xs font-bold" style="min-height:36px;">
+            Выключить
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center bg-black/40 p-2.5 rounded-xl border border-white/5 font-mono tabular-nums">
+          <div>
+            <span class="text-[9px] uppercase text-slate-500 block">Мощность</span>
+            <span class="text-xs font-bold text-emerald-400" id="socketWatts">0.0 Вт</span>
+          </div>
+          <div>
+            <span class="text-[9px] uppercase text-slate-500 block">Напряжение</span>
+            <span class="text-xs font-bold text-slate-300" id="socketVolts">230 В</span>
+          </div>
+          <div>
+            <span class="text-[9px] uppercase text-slate-500 block">Ток</span>
+            <span class="text-xs font-bold text-slate-300" id="socketAmps">0.0 А</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Camera Viewer (Tapo C210) -->
+      <div class="bg-surface rounded-2xl p-3.5 border border-surfaceBorder shadow-lg">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-white flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan-400"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            Камера стола (Tapo C210)
+          </span>
+          <span class="text-[10px] text-slate-500 font-mono">192.168.1.34</span>
+        </div>
+
+        <div class="relative rounded-xl overflow-hidden bg-black/80 aspect-video mb-2.5 border border-white/10 flex items-center justify-center">
+          <img id="cameraLiveFeed" src="http://192.168.1.21:8889/snapshot" alt="Camera Feed" class="w-full h-full object-contain" onerror="this.style.display='none'; document.getElementById('cameraFallback').classList.remove('hidden');" onload="this.style.display='block'; document.getElementById('cameraFallback').classList.add('hidden');">
+          <div id="cameraFallback" class="hidden text-center p-4">
+            <p class="text-xs text-slate-400 mb-1">Снимок доступен в локальной сети</p>
+            <p class="text-[10px] text-slate-600">Нажмите кнопку ниже для отправки фото в Telegram чат</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="refreshCameraSnapshot()" class="btn-tactile bg-surfaceCard hover:bg-surfaceHover border border-white/5 rounded-xl text-xs font-bold text-slate-300 gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+            Обновить снимок
+          </button>
+          <button onclick="sendCommand('TAKE_SNAPSHOT')" class="btn-tactile bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 rounded-xl text-xs font-bold gap-1.5">
+            📷 Фото в чат TG
+          </button>
+        </div>
+      </div>
+
+      <!-- CR-Touch 4-Corner Leveling with Circular Screw Dials -->
+      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder shadow-md">
         <div class="flex items-center justify-between mb-2">
           <span class="text-xs font-bold text-white flex items-center gap-1.5">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-400"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
-            Калибровка стола: 4 винта (CR-Touch)
+            Калибровка 4 винтов (CR-Touch)
           </span>
-          <span class="text-[10px] text-purple-400 font-mono font-bold" id="screwsStatusHeader">Готов к замеру</span>
+          <button onclick="sendCommand('SCREWS_LEVELING')" class="btn-tactile px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[10px] font-bold" style="min-height:30px;">
+            📐 Запустить замер
+          </button>
         </div>
-        <p class="text-[10px] text-slate-400 mb-3">Интерактивные крутилки винтов: направление (↻ CW / ↺ CCW) и угол поворота:</p>
         
-        <!-- Bed Plate with 4 Corner Dials (300x300 Layout) -->
-        <div class="bg-slate-950 p-3 rounded-2xl border border-surfaceBorder/80 mb-3 relative overflow-hidden">
-          <div class="absolute inset-0 bg-[radial-gradient(#1f293d_1px,transparent_1px)] [background-size:16px_16px] opacity-30 pointer-events-none"></div>
-          
-          <!-- Top Row: Rear Screws (RL & RR) -->
-          <div class="grid grid-cols-2 gap-3 mb-3 relative z-10">
-            <!-- Rear Left (RL) -->
-            <div id="cardRL" class="flex flex-col items-center bg-slate-900/80 p-2.5 rounded-2xl border border-surfaceBorder/70 transition-all duration-300">
-              <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Задний левый</span>
-              <div class="relative w-16 h-16 flex items-center justify-center my-0.5">
+        <!-- Bed Plate (300x300) with 4 Dials -->
+        <div class="bg-slate-950 p-3 rounded-2xl border border-white/5 mb-3 relative overflow-hidden">
+          <!-- Top Row (Rear RL & RR) -->
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div id="cardRL" class="flex flex-col items-center bg-surfaceCard p-2 rounded-xl border border-white/5">
+              <span class="text-[9px] font-bold text-slate-400 uppercase mb-1">Задний левый</span>
+              <div class="relative w-14 h-14 flex items-center justify-center">
                 <svg class="w-full h-full" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="44" fill="none" stroke="#1f2937" stroke-width="3" stroke-dasharray="2 6"/>
-                  <line x1="50" y1="4" x2="50" y2="10" stroke="#64748b" stroke-width="2"/>
-                  <line x1="96" y1="50" x2="90" y2="50" stroke="#64748b" stroke-width="2"/>
-                  <line x1="50" y1="96" x2="50" y2="90" stroke="#64748b" stroke-width="2"/>
-                  <line x1="4" y1="50" x2="10" y2="50" stroke="#64748b" stroke-width="2"/>
                   <circle cx="50" cy="50" r="33" fill="#0b1120" stroke="#334155" stroke-width="2"/>
-                  <circle cx="50" cy="50" r="26" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-dasharray="4 8"/>
-                  <g id="dialNeedle-RL" transform="rotate(18, 50, 50)" class="transition-transform duration-700 ease-out">
-                    <line x1="50" y1="50" x2="50" y2="20" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
-                    <polygon points="50,14 46,22 54,22" fill="#38bdf8"/>
-                    <circle cx="50" cy="50" r="4" fill="#38bdf8"/>
+                  <g id="dialNeedleRL" class="screw-dial-indicator">
+                    <line x1="50" y1="50" x2="50" y2="20" stroke="#10b981" stroke-width="3.5" stroke-linecap="round"/>
+                    <circle cx="50" cy="20" r="3" fill="#10b981"/>
                   </g>
+                  <circle cx="50" cy="50" r="4" fill="#64748b"/>
                 </svg>
-                <div id="dialCenter-RL" class="absolute inset-0 flex items-center justify-center pointer-events-none text-cyan-400 font-bold text-xs">↻</div>
               </div>
-              <span id="screwRL" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 mb-0.5">CW 00:03 (18°)</span>
-              <span id="screwTextRL" class="text-[9px] text-slate-400 text-center font-medium">По часовой ~3 мин</span>
+              <span id="labelRL" class="text-[10px] font-mono font-bold text-emerald-400 mt-1">ОК</span>
             </div>
 
-            <!-- Rear Right (RR) -->
-            <div id="cardRR" class="flex flex-col items-center bg-slate-900/80 p-2.5 rounded-2xl border border-surfaceBorder/70 transition-all duration-300">
-              <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Задний правый</span>
-              <div class="relative w-16 h-16 flex items-center justify-center my-0.5">
+            <div id="cardRR" class="flex flex-col items-center bg-surfaceCard p-2 rounded-xl border border-white/5">
+              <span class="text-[9px] font-bold text-slate-400 uppercase mb-1">Задний правый</span>
+              <div class="relative w-14 h-14 flex items-center justify-center">
                 <svg class="w-full h-full" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="44" fill="none" stroke="#1f2937" stroke-width="3" stroke-dasharray="2 6"/>
-                  <line x1="50" y1="4" x2="50" y2="10" stroke="#64748b" stroke-width="2"/>
-                  <line x1="96" y1="50" x2="90" y2="50" stroke="#64748b" stroke-width="2"/>
-                  <line x1="50" y1="96" x2="50" y2="90" stroke="#64748b" stroke-width="2"/>
-                  <line x1="4" y1="50" x2="10" y2="50" stroke="#64748b" stroke-width="2"/>
                   <circle cx="50" cy="50" r="33" fill="#0b1120" stroke="#334155" stroke-width="2"/>
-                  <circle cx="50" cy="50" r="26" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-dasharray="4 8"/>
-                  <g id="dialNeedle-RR" transform="rotate(-84, 50, 50)" class="transition-transform duration-700 ease-out">
-                    <line x1="50" y1="50" x2="50" y2="20" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
-                    <polygon points="50,14 46,22 54,22" fill="#f59e0b"/>
-                    <circle cx="50" cy="50" r="4" fill="#f59e0b"/>
+                  <g id="dialNeedleRR" class="screw-dial-indicator">
+                    <line x1="50" y1="50" x2="50" y2="20" stroke="#10b981" stroke-width="3.5" stroke-linecap="round"/>
+                    <circle cx="50" cy="20" r="3" fill="#10b981"/>
                   </g>
+                  <circle cx="50" cy="50" r="4" fill="#64748b"/>
                 </svg>
-                <div id="dialCenter-RR" class="absolute inset-0 flex items-center justify-center pointer-events-none text-amber-400 font-bold text-xs">↺</div>
               </div>
-              <span id="screwRR" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 mb-0.5">CCW 00:14 (84°)</span>
-              <span id="screwTextRR" class="text-[9px] text-slate-400 text-center font-medium">Против часовой ~14 мин</span>
+              <span id="labelRR" class="text-[10px] font-mono font-bold text-emerald-400 mt-1">ОК</span>
             </div>
           </div>
 
-          <!-- Center Plate Label -->
-          <div class="flex items-center justify-center py-1 mb-3">
-            <div class="px-3 py-1 rounded-xl bg-slate-900 border border-surfaceBorder/80 text-[10px] font-mono text-slate-400 flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
-              СТОЛ 300 × 300 мм
-            </div>
-          </div>
-
-          <!-- Bottom Row: Front Screws (FL [Base] & FR) -->
-          <div class="grid grid-cols-2 gap-3 relative z-10">
-            <!-- Front Left (FL) - REFERENCE BASE -->
-            <div id="cardFL" class="flex flex-col items-center bg-emerald-950/20 p-2.5 rounded-2xl border border-emerald-500/30 transition-all duration-300">
-              <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Передний левый (База)</span>
-              <div class="relative w-16 h-16 flex items-center justify-center my-0.5">
+          <!-- Bottom Row (Front FL & FR) -->
+          <div class="grid grid-cols-2 gap-3">
+            <div id="cardFL" class="flex flex-col items-center bg-surfaceCard p-2 rounded-xl border border-white/5">
+              <span class="text-[9px] font-bold text-slate-400 uppercase mb-1">Передний левый (База)</span>
+              <div class="relative w-14 h-14 flex items-center justify-center">
                 <svg class="w-full h-full" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="44" fill="none" stroke="#065f46" stroke-width="3" stroke-dasharray="2 6"/>
-                  <circle cx="50" cy="50" r="33" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
-                  <path d="M40 50 L47 57 L62 40" fill="none" stroke="#34d399" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="#1f2937" stroke-width="3"/>
+                  <circle cx="50" cy="50" r="33" fill="#0b1120" stroke="#10b981" stroke-width="2"/>
+                  <circle cx="50" cy="50" r="4" fill="#10b981"/>
                 </svg>
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none text-emerald-300 font-bold text-xs">✓</div>
               </div>
-              <span id="screwFL" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 mb-0.5">00:00 (БАЗА)</span>
-              <span id="screwTextFL" class="text-[9px] text-emerald-400/80 text-center font-medium">Не крутить (Эталон)</span>
+              <span class="text-[10px] font-mono font-bold text-emerald-400 mt-1">БАЗА 0.0</span>
             </div>
 
-            <!-- Front Right (FR) -->
-            <div id="cardFR" class="flex flex-col items-center bg-slate-900/80 p-2.5 rounded-2xl border border-surfaceBorder/70 transition-all duration-300">
-              <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Передний правый</span>
-              <div class="relative w-16 h-16 flex items-center justify-center my-0.5">
+            <div id="cardFR" class="flex flex-col items-center bg-surfaceCard p-2 rounded-xl border border-white/5">
+              <span class="text-[9px] font-bold text-slate-400 uppercase mb-1">Передний правый</span>
+              <div class="relative w-14 h-14 flex items-center justify-center">
                 <svg class="w-full h-full" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="44" fill="none" stroke="#1f2937" stroke-width="3" stroke-dasharray="2 6"/>
-                  <line x1="50" y1="4" x2="50" y2="10" stroke="#64748b" stroke-width="2"/>
-                  <line x1="96" y1="50" x2="90" y2="50" stroke="#64748b" stroke-width="2"/>
-                  <line x1="50" y1="96" x2="50" y2="90" stroke="#64748b" stroke-width="2"/>
-                  <line x1="4" y1="50" x2="10" y2="50" stroke="#64748b" stroke-width="2"/>
                   <circle cx="50" cy="50" r="33" fill="#0b1120" stroke="#334155" stroke-width="2"/>
-                  <circle cx="50" cy="50" r="26" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-dasharray="4 8"/>
-                  <g id="dialNeedle-FR" transform="rotate(48, 50, 50)" class="transition-transform duration-700 ease-out">
-                    <line x1="50" y1="50" x2="50" y2="20" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
-                    <polygon points="50,14 46,22 54,22" fill="#38bdf8"/>
-                    <circle cx="50" cy="50" r="4" fill="#38bdf8"/>
+                  <g id="dialNeedleFR" class="screw-dial-indicator">
+                    <line x1="50" y1="50" x2="50" y2="20" stroke="#10b981" stroke-width="3.5" stroke-linecap="round"/>
+                    <circle cx="50" cy="20" r="3" fill="#10b981"/>
                   </g>
+                  <circle cx="50" cy="50" r="4" fill="#64748b"/>
                 </svg>
-                <div id="dialCenter-FR" class="absolute inset-0 flex items-center justify-center pointer-events-none text-cyan-400 font-bold text-xs">↻</div>
               </div>
-              <span id="screwFR" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 mb-0.5">CW 00:08 (48°)</span>
-              <span id="screwTextFR" class="text-[9px] text-slate-400 text-center font-medium">По часовой ~8 мин</span>
+              <span id="labelFR" class="text-[10px] font-mono font-bold text-emerald-400 mt-1">ОК</span>
             </div>
           </div>
         </div>
+      </div>
 
+      <!-- Filament Management -->
+      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder">
+        <span class="text-xs font-bold text-white block mb-2">🧵 Операции с филаментом</span>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="sendCommand('LOAD_FILAMENT')" class="btn-tactile bg-surfaceCard hover:bg-surfaceHover border border-white/5 rounded-xl text-xs font-bold text-emerald-400">
+            Заправить
+          </button>
+          <button onclick="sendCommand('UNLOAD_FILAMENT')" class="btn-tactile bg-surfaceCard hover:bg-surfaceHover border border-white/5 rounded-xl text-xs font-bold text-orange-400">
+            Выгрузить
+          </button>
+          <button onclick="sendCommand('DRY_FILAMENT')" class="btn-tactile bg-surfaceCard hover:bg-surfaceHover border border-white/5 rounded-xl text-xs font-bold text-amber-400">
+            ♨️ Сушка 65°
+          </button>
+        </div>
+      </div>
+
+      <!-- Resurrect & System Controls -->
+      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder space-y-2">
+        <span class="text-xs font-bold text-white block mb-1">⚙️ Система и сервис</span>
         <div class="grid grid-cols-2 gap-2">
-          <button onclick="sendCommand('SCREWS_LEVELING')" class="py-2.5 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
-            Запустить замер стола
+          <button onclick="sendCommand('RESURRECT_AUTO')" class="btn-tactile bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 rounded-xl text-xs font-bold">
+            ⚡ Авто-спасение
           </button>
-          <button onclick="demoScrewsCycle()" class="py-2.5 bg-slate-900 hover:bg-slate-800 border border-surfaceBorder text-slate-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-            Тест крутилок
+          <button onclick="sendCommand('SERVICE_PARK')" class="btn-tactile bg-surfaceCard hover:bg-surfaceHover border border-white/5 text-slate-200 rounded-xl text-xs font-bold">
+            📐 Парковка Z200
           </button>
-        </div>
-      </div>
-      
-      <!-- Service Utilities Bento Grid -->
-      <div class="grid grid-cols-2 gap-2 mb-3.5">
-        <!-- Bed Prep -->
-        <button onclick="sendCommand('PREPARE_BED')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
-          <div class="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 w-fit mb-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m14 12-8.5 8.5a2.12 2.12 0 1 1-3-3L11 9"/><path d="M15 13 9 7l4-4 6 6h3a8 8 0 0 1-7 7z"/></svg>
-          </div>
-          <p class="text-xs font-bold text-white">Стол вперёд</p>
-          <p class="text-[9px] text-slate-400">Y290, Z100 + прогрев</p>
-        </button>
-
-        <!-- Service Park -->
-        <button onclick="sendCommand('SERVICE_PARK')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
-          <div class="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 w-fit mb-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>
-          </div>
-          <p class="text-xs font-bold text-white">Парковка Z200</p>
-          <p class="text-[9px] text-slate-400">Для чистки сопла</p>
-        </button>
-
-        <!-- Filament Load -->
-        <button onclick="sendCommand('LOAD_FILAMENT')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
-          <div class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 w-fit mb-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          </div>
-          <p class="text-xs font-bold text-white">Загрузка нити</p>
-          <p class="text-[9px] text-slate-400">210°C + подача 60 мм</p>
-        </button>
-
-        <!-- Filament Unload -->
-        <button onclick="sendCommand('UNLOAD_FILAMENT')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
-          <div class="p-1.5 rounded-lg bg-orange-500/10 text-orange-400 w-fit mb-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" x2="8.12" y1="4" y2="15.88"/><line x1="14.47" x2="20" y1="14.48" y2="20"/><line x1="8.12" x2="12" y1="8.12" y2="12"/></svg>
-          </div>
-          <p class="text-xs font-bold text-white">Выгрузка нити</p>
-          <p class="text-[9px] text-slate-400">Откат прутка</p>
-        </button>
-
-        <!-- Dry Filament -->
-        <button onclick="sendCommand('DRY_FILAMENT')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
-          <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 w-fit mb-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          </div>
-          <p class="text-xs font-bold text-white">Сушка катушки</p>
-          <p class="text-[9px] text-slate-400">Стол 65°C / 4 часа</p>
-        </button>
-
-        <!-- Motors Off -->
-        <button onclick="sendCommand('MOTORS_OFF')" class="bg-surface hover:bg-surfaceHover p-3 rounded-2xl border border-surfaceBorder text-left btn-tactile">
-          <div class="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 w-fit mb-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>
-          </div>
-          <p class="text-xs font-bold text-white">Снять моторы</p>
-          <p class="text-[9px] text-slate-400">M84 (ручное движение)</p>
-        </button>
-      </div>
-
-      <!-- Modes & Tunes -->
-      <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder mb-3.5">
-        <p class="text-xs font-bold text-white mb-2 flex items-center gap-1.5">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-yellow-400"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-          Режимы скорости и звуки
-        </p>
-        <div class="grid grid-cols-2 gap-2 mb-2">
-          <button onclick="sendCommand('NIGHT_MODE')" class="py-2 px-2.5 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-[11px] font-medium text-slate-200 text-left btn-tactile">
-            🌙 Ночной тихий
-            <span class="block text-[9px] text-slate-400">80% / Accel 1500</span>
+          <button onclick="sendCommand('FIRMWARE_RESTART')" class="btn-tactile bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-bold">
+            🔄 Перезапуск Klipper
           </button>
-          <button onclick="sendCommand('DAY_MODE')" class="py-2 px-2.5 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-[11px] font-medium text-slate-200 text-left btn-tactile">
-            ☀️ Дневной скоростной
-            <span class="block text-[9px] text-slate-400">100% / Accel 3500</span>
+          <button onclick="sendCommand('SONG_MARIO')" class="btn-tactile bg-surfaceCard hover:bg-surfaceHover border border-white/5 text-slate-200 rounded-xl text-xs font-bold">
+            🍄 Mario Theme
           </button>
         </div>
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="sendCommand('SONG_STAR_WARS')" class="py-2 px-2.5 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-[11px] font-medium text-slate-200 btn-tactile">
-            🎺 Star Wars March
-          </button>
-          <button onclick="sendCommand('SONG_MARIO')" class="py-2 px-2.5 bg-slate-900/60 hover:bg-surfaceHover border border-surfaceBorder rounded-xl text-[11px] font-medium text-slate-200 btn-tactile">
-            🍄 Super Mario Win
-          </button>
-        </div>
-      </div>
-
-      <!-- System Controls (Safe Poweroff & Reboot) -->
-      <div class="space-y-2 mb-3.5">
-        <button onclick="sendCommand('FIRMWARE_RESTART')" class="w-full py-2.5 bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
-          Перезапуск Klipper (FIRMWARE_RESTART)
-        </button>
-
-        <button onclick="confirmPowerOff()" class="w-full py-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 btn-tactile">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" x2="12" y1="2" y2="12"/></svg>
-          ⚡ Безопасное выключение принтера
-        </button>
       </div>
 
     </div>
 
-  </div>
+  </main>
 
-  <!-- BOTTOM TAB BAR (iOS / Modern Android Style) -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-md border-t border-surfaceBorder/80 px-4 py-2 z-50">
-    <div class="max-w-md mx-auto grid grid-cols-3 gap-1">
-      
-      <!-- Tab 1: Cockpit -->
-      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center py-1 rounded-xl text-emerald-400 font-bold text-[10px] btn-tactile">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mb-0.5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
-        Пульт
-      </button>
 
-      <!-- Tab 2: Files & Queue -->
-      <button onclick="switchTab('files')" id="nav-files" class="flex flex-col items-center justify-center py-1 rounded-xl text-slate-400 font-medium text-[10px] btn-tactile">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mb-0.5"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
-        Файлы & Очередь
-      </button>
-
-      <!-- Tab 3: Service -->
-      <button onclick="switchTab('service')" id="nav-service" class="flex flex-col items-center justify-center py-1 rounded-xl text-slate-400 font-medium text-[10px] btn-tactile">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mb-0.5"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-        Сервис
-      </button>
-
-    </div>
+  <!-- ========================================================================= -->
+  <!-- BOTTOM FIXED NAVIGATION BAR (Touch targets >= 48px, iOS Home Bar safe) -->
+  <!-- ========================================================================= -->
+  <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-surface/95 backdrop-blur-xl border-t border-white/10 px-3 py-2 z-50 flex items-center justify-around shadow-[0_-10px_25px_rgba(0,0,0,0.5)]" style="padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));">
+    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="btn-tactile flex-col flex-1 py-1 rounded-xl text-emerald-400 font-bold text-[10px] gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      Пульт
+    </button>
+    <button onclick="switchTab('controls')" id="nav-controls" class="btn-tactile flex-col flex-1 py-1 rounded-xl text-slate-400 font-medium text-[10px] gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg>
+      Оси и Тюнинг
+    </button>
+    <button onclick="switchTab('files')" id="nav-files" class="btn-tactile flex-col flex-1 py-1 rounded-xl text-slate-400 font-medium text-[10px] gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Файлы
+    </button>
+    <button onclick="switchTab('service')" id="nav-service" class="btn-tactile flex-col flex-1 py-1 rounded-xl text-slate-400 font-medium text-[10px] gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      Сервис
+    </button>
   </nav>
 
-  <!-- JAVASCRIPT LOGIC -->
-  <script>
-    // Universal Bridge (Telegram WebApp & MAX Bridge support)
-    const tg = window.Telegram?.WebApp;
-    const maxBridge = window.maxBridge || window.MaxWebApp;
 
+  <!-- ========================================================================= -->
+  <!-- BOTTOM SHEET MODAL (STOP PRINT CONFIRMATION) -->
+  <!-- ========================================================================= -->
+  <div id="stopModalBackdrop" class="sheet-backdrop" onclick="closeStopModal()">
+    <div class="sheet-content" onclick="event.stopPropagation()">
+      <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-4"></div>
+      <div class="text-center mb-4">
+        <div class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto mb-2.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="16" height="16" x="4" y="4" rx="2"/></svg>
+        </div>
+        <h3 class="text-base font-bold text-white">Остановить печать?</h3>
+        <p class="text-xs text-slate-400 mt-1">Текущая деталь будет испорчена. Нагреватели сопла и стола отключатся.</p>
+      </div>
+      <div class="grid grid-cols-2 gap-2.5">
+        <button onclick="closeStopModal()" class="btn-tactile py-3 rounded-xl bg-surfaceCard hover:bg-surfaceHover text-slate-300 font-bold text-xs border border-white/5">
+          Отмена
+        </button>
+        <button onclick="confirmStopPrint()" class="btn-tactile py-3 rounded-xl bg-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-500/30">
+          Да, остановить
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- BOTTOM SHEET MODAL (START PRINT CONFIRMATION) -->
+  <!-- ========================================================================= -->
+  <div id="startModalBackdrop" class="sheet-backdrop" onclick="closeStartModal()">
+    <div class="sheet-content" onclick="event.stopPropagation()">
+      <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-4"></div>
+      <div class="flex items-center gap-3 mb-4 bg-black/40 p-3 rounded-xl border border-white/10">
+        <img id="startModalThumb" src="" alt="3D" class="w-14 h-14 rounded-lg object-contain bg-black/60 p-1 border border-white/10 shrink-0">
+        <div class="flex-1 truncate">
+          <span class="text-[9px] uppercase tracking-wider text-emerald-400 font-bold block" id="startModalMat">PETG</span>
+          <h4 class="text-xs font-bold text-white truncate" id="startModalName">Модель</h4>
+          <p class="text-[10px] text-slate-400 mt-0.5" id="startModalDetails">~1ч 20м • 35 г</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2.5">
+        <button onclick="closeStartModal()" class="btn-tactile py-3 rounded-xl bg-surfaceCard hover:bg-surfaceHover text-slate-300 font-bold text-xs border border-white/5">
+          Назад
+        </button>
+        <button onclick="confirmStartPrint()" class="btn-tactile py-3 rounded-xl bg-emerald-500 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/30">
+          🚀 Запустить печать
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- BOTTOM SHEET MODAL (SAFE POWER OFF CONFIRMATION) -->
+  <!-- ========================================================================= -->
+  <div id="powerModalBackdrop" class="sheet-backdrop" onclick="closePowerModal()">
+    <div class="sheet-content" onclick="event.stopPropagation()">
+      <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-4"></div>
+      <div class="text-center mb-4">
+        <div class="w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-2.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+        </div>
+        <h3 class="text-base font-bold text-white">Отключить питание 24V?</h3>
+        <p class="text-xs text-slate-400 mt-1" id="powerModalWarn">Рекомендуется безопасное выключение: сопло остынет до 50°C перед отключением розетки.</p>
+      </div>
+      <div class="space-y-2">
+        <button onclick="executeSafePowerOff()" class="btn-tactile w-full py-3 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold text-xs">
+          🛡️ Безопасное выключение (с остыванием)
+        </button>
+        <button onclick="executeForcePowerOff()" class="btn-tactile w-full py-3 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold text-xs">
+          ⚡ Обесточить немедленно
+        </button>
+        <button onclick="closePowerModal()" class="btn-tactile w-full py-2.5 rounded-xl bg-surfaceCard text-slate-400 font-medium text-xs">
+          Отмена
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT LOGIC: SSE STREAMING, TOUCH HAPTICS, ROUTING -->
+  <!-- ========================================================================= -->
+  <script>
+    const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
       tg.expand();
       try {
-        tg.setHeaderColor('#080c14');
-        tg.setBackgroundColor('#080c14');
+        tg.setHeaderColor('#06090e');
+        tg.setBackgroundColor('#06090e');
       } catch (e) {}
     }
 
@@ -802,31 +927,35 @@
     function triggerHaptic(type = 'light') {
       try {
         if (tg?.HapticFeedback) {
-          if (type === 'light' || type === 'medium' || type === 'heavy') {
-            tg.HapticFeedback.impactOccurred(type);
-          } else if (type === 'success' || type === 'warning' || type === 'error') {
-            tg.HapticFeedback.notificationOccurred(type);
-          }
-        } else if (navigator.vibrate) {
-          navigator.vibrate(type === 'heavy' ? 40 : 15);
+          if (type === 'light') tg.HapticFeedback.impactOccurred('light');
+          else if (type === 'medium') tg.HapticFeedback.impactOccurred('medium');
+          else if (type === 'heavy') tg.HapticFeedback.impactOccurred('heavy');
+          else if (type === 'success') tg.HapticFeedback.notificationOccurred('success');
+          else if (type === 'warning') tg.HapticFeedback.notificationOccurred('warning');
+          return;
+        }
+        if (navigator.vibrate) {
+          navigator.vibrate(type === 'medium' ? 22 : 12);
         }
       } catch (e) {}
     }
 
-    // Tab Navigation
+    // Tabs Switching
+    let currentTab = 'dashboard';
     function switchTab(tabId) {
       triggerHaptic('light');
+      currentTab = tabId;
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       const activeEl = document.getElementById('tab-' + tabId);
       if (activeEl) activeEl.classList.add('active');
 
-      ['dashboard', 'files', 'service'].forEach(t => {
+      ['dashboard', 'controls', 'files', 'service'].forEach(t => {
         const btn = document.getElementById('nav-' + t);
         if (btn) {
           if (t === tabId) {
-            btn.className = 'flex flex-col items-center justify-center py-1 rounded-xl text-emerald-400 font-bold text-[10px] btn-tactile';
+            btn.className = 'btn-tactile flex-col flex-1 py-1 rounded-xl text-emerald-400 font-bold text-[10px] gap-1';
           } else {
-            btn.className = 'flex flex-col items-center justify-center py-1 rounded-xl text-slate-400 font-medium text-[10px] btn-tactile';
+            btn.className = 'btn-tactile flex-col flex-1 py-1 rounded-xl text-slate-400 font-medium text-[10px] gap-1';
           }
         }
       });
@@ -836,104 +965,7 @@
       }
     }
 
-    // Light toggles (Dual Zone)
-    let lightState = { nozzle: false, frame: false };
-    function toggleTVNotify() {
-      triggerHaptic('medium');
-      sendCommand('TOGGLE_TV_NOTIFY');
-      showToast('📺 ТВ Индикация переключена');
-    }
-
-    function toggleLight(zone) {
-      triggerHaptic('medium');
-      lightState[zone] = !lightState[zone];
-      
-      const isNozzle = (zone === 'nozzle');
-      const dot = document.getElementById(isNozzle ? 'lightNozzleDot' : 'lightFrameDot');
-      const status = document.getElementById(isNozzle ? 'lightNozzleStatus' : 'lightFrameStatus');
-      const isOn = lightState[zone];
-
-      if (isOn) {
-        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]';
-        status.innerText = 'Включено';
-        status.className = 'text-[9px] text-emerald-400 font-bold';
-      } else {
-        dot.className = 'w-2.5 h-2.5 rounded-full bg-slate-700';
-        status.innerText = 'Выключено';
-        status.className = 'text-[9px] text-slate-500';
-      }
-
-      sendCommand(isNozzle ? (isOn ? 'LIGHT_NOZZLE_ON' : 'LIGHT_NOZZLE_OFF') : (isOn ? 'LIGHT_FRAME_ON' : 'LIGHT_FRAME_OFF'));
-    }
-
-    // Local Moonraker Direct Execution (for Redmi standalone screen)
-    const MOONRAKER_LOCAL = 'http://127.0.0.1:7125';
-
-    async function executeMoonrakerDirect(cmd, params = {}) {
-      try {
-        if (cmd === 'PAUSE') {
-          await fetch(`${MOONRAKER_LOCAL}/printer/print/pause`, { method: 'POST' });
-        } else if (cmd === 'RESUME') {
-          await fetch(`${MOONRAKER_LOCAL}/printer/print/resume`, { method: 'POST' });
-        } else if (cmd === 'CANCEL') {
-          await fetch(`${MOONRAKER_LOCAL}/printer/print/cancel`, { method: 'POST' });
-        } else if (cmd === 'START_PRINT' && params.filename) {
-          await fetch(`${MOONRAKER_LOCAL}/printer/print/start`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ filename: params.filename })
-          });
-          switchTab('dashboard');
-        } else {
-          let gcode = '';
-          if (cmd === 'PREHEAT_PLA') gcode = 'PREHEAT_PLA';
-          else if (cmd === 'PREHEAT_PETG') gcode = 'PREHEAT_PETG';
-          else if (cmd === 'PREHEAT_STANDBY') gcode = 'PREHEAT_STANDBY';
-          else if (cmd === 'COOLDOWN') gcode = 'COOLDOWN';
-          else if (cmd === 'PREPARE_BED') gcode = 'PREPARE_BED';
-          else if (cmd === 'SCREWS_LEVELING') gcode = 'SCREWS_LEVELING';
-          else if (cmd === 'LOAD_FILAMENT') gcode = 'LOAD_FILAMENT';
-          else if (cmd === 'UNLOAD_FILAMENT') gcode = 'UNLOAD_FILAMENT';
-          else if (cmd === 'DRY_FILAMENT') gcode = 'M140 S65';
-          else if (cmd === 'SERVICE_PARK') gcode = 'G28\nG1 Z200 F1500\nG1 Y290 F3000';
-          else if (cmd === 'MOTORS_OFF') gcode = 'M84';
-          else if (cmd === 'NIGHT_MODE') gcode = 'M220 S50\nSET_VELOCITY_LIMIT ACCEL=1000';
-          else if (cmd === 'DAY_MODE') gcode = 'M220 S100\nSET_VELOCITY_LIMIT ACCEL=3000';
-          else if (cmd === 'SONG_STAR_WARS') gcode = 'M300 S440 P500\nM300 S440 P500\nM300 S440 P500\nM300 S349 P350\nM300 S523 P150\nM300 S440 P500\nM300 S349 P350\nM300 S523 P150\nM300 S440 P1000';
-          else if (cmd === 'SONG_MARIO') gcode = 'M300 S660 P100\nM300 S660 P100\nM300 S0 P100\nM300 S660 P100\nM300 S0 P100\nM300 S510 P100\nM300 S660 P100\nM300 S0 P100\nM300 S770 P100';
-          else if (cmd === 'TUNE_SPEED_80') gcode = 'M220 S80';
-          else if (cmd === 'TUNE_SPEED_100') gcode = 'M220 S100';
-          else if (cmd === 'TUNE_SPEED_120') gcode = 'M220 S120';
-          else if (cmd === 'TUNE_Z_DOWN') gcode = 'SET_GCODE_OFFSET Z_ADJUST=-0.02 MOVE=1';
-          else if (cmd === 'TUNE_Z_UP') gcode = 'SET_GCODE_OFFSET Z_ADJUST=+0.02 MOVE=1';
-          else if (cmd === 'TUNE_FAN_0') gcode = 'M106 S0';
-          else if (cmd === 'TUNE_FAN_128') gcode = 'M106 S128';
-          else if (cmd === 'TUNE_FAN_255') gcode = 'M106 S255';
-          else if (cmd === 'LIGHT_NOZZLE_ON') gcode = 'SET_PIN PIN=led_nozzle VALUE=1';
-          else if (cmd === 'LIGHT_NOZZLE_OFF') gcode = 'SET_PIN PIN=led_nozzle VALUE=0';
-          else if (cmd === 'LIGHT_FRAME_ON') gcode = 'SET_PIN PIN=led_frame VALUE=1';
-          else if (cmd === 'LIGHT_FRAME_OFF') gcode = 'SET_PIN PIN=led_frame VALUE=0';
-          else if (cmd === 'SAFE_POWER_OFF') gcode = 'SAFE_POWER_OFF';
-          else if (cmd === 'FIRMWARE_RESTART') {
-            await fetch(`${MOONRAKER_LOCAL}/printer/firmware_restart`, { method: 'POST' });
-            return;
-          }
-
-          if (gcode) {
-            await fetch(`${MOONRAKER_LOCAL}/printer/gcode/script`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ script: gcode })
-            });
-          }
-        }
-      } catch (err) {
-        console.warn('Direct Moonraker execution notice:', err);
-      }
-    }
-
-    const NTFY_TOPIC = 'myender_kamelhin_cmd_82737';
-
+    // Toast Notice
     function showToast(text, isError = false) {
       const toast = document.getElementById('toastBox');
       if (!toast) return;
@@ -944,12 +976,12 @@
       setTimeout(() => toast.classList.remove('show'), 1800);
     }
 
-    // High-speed In-App Command Router (Never closes or kicks out of the Mini App!)
+    // High Speed In-App Command Router (via ntfy relay)
+    const NTFY_CMD_TOPIC = 'myender_kamelhin_cmd_82737';
     async function sendCommand(cmd, params = {}) {
       triggerHaptic('medium');
       const payload = { cmd: cmd, ...params };
 
-      // Map friendly labels for in-app feedback
       const labels = {
         'PREHEAT_PLA': '🌱 Прогрев PLA (200°/60°)',
         'PREHEAT_PETG': '🔥 Прогрев PETG (230°/78°)',
@@ -958,593 +990,427 @@
         'PAUSE': '⏸ Печать на паузе',
         'RESUME': '▶️ Печать возобновлена',
         'CANCEL': '⏹ Печать отменена',
-        'PREPARE_BED': '🧽 Стол выдвинут',
-        'SCREWS_LEVELING': '📐 Замер винтов',
-        'SERVICE_PARK': '🚀 Сервисная парковка',
+        'HOME_ALL': '🏠 Домой Все (G28)',
+        'HOME_XY': '🏠 Домой XY',
+        'HOME_Z': '📐 Замер CR-Touch Z',
+        'EXTRUDE': '⬇️ Подача филамента',
+        'RETRACT': '⬆️ Откат филамента',
         'MOTORS_OFF': '🔓 Моторы отключены',
-        'NIGHT_MODE': '🌙 Ночной режим',
-        'DAY_MODE': '☀️ Дневной режим',
-        'SONG_STAR_WARS': '🎵 Star Wars',
-        'SONG_MARIO': '🍄 Super Mario',
-        'SAFE_POWER_OFF': '⚡ Безопасное выключение',
-        'LIGHT_NOZZLE_ON': '💡 Подсветка сопла: ВКЛ',
-        'LIGHT_NOZZLE_OFF': '🌑 Подсветка сопла: ВЫКЛ',
-        'LIGHT_FRAME_ON': '💡 Подсветка стола: ВКЛ',
-        'LIGHT_FRAME_OFF': '🌑 Подсветка стола: ВЫКЛ',
+        'SERVICE_PARK': '📐 Парковка Z200 Y290',
+        'SCREWS_LEVELING': '📐 Замер винтов',
+        'FIRMWARE_RESTART': '🔄 Перезапуск Klipper',
+        'TAKE_SNAPSHOT': '📷 Фото отправлено в чат',
       };
 
       showToast(labels[cmd] || `⚡ ${cmd}`);
 
-      // 1. Direct Background HTTP POST via ntfy relay (stays inside Mini App, 0.1s response)
       try {
-        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+        fetch(`https://ntfy.sh/${NTFY_CMD_TOPIC}`, {
           method: 'POST',
           headers: { 'Title': 'MiniApp Command' },
           body: JSON.stringify(payload)
         }).catch(() => {});
       } catch (e) {}
 
-      // 2. Also try direct Moonraker execution if on local Wi-Fi
+      // Fallback direct execution if running on local device
+      executeMoonrakerDirect(cmd, params);
+    }
+
+    // Local Moonraker Direct Execution (for Redmi standalone screen)
+    const MOONRAKER_LOCAL = 'http://127.0.0.1:7125';
+    async function executeMoonrakerDirect(cmd, params = {}) {
       try {
-        executeMoonrakerDirect(cmd, params);
-      } catch (e) {}
+        if (cmd === 'PAUSE') await fetch(`${MOONRAKER_LOCAL}/printer/print/pause`, { method: 'POST' });
+        else if (cmd === 'RESUME') await fetch(`${MOONRAKER_LOCAL}/printer/print/resume`, { method: 'POST' });
+        else if (cmd === 'CANCEL') await fetch(`${MOONRAKER_LOCAL}/printer/print/cancel`, { method: 'POST' });
+        else if (cmd === 'START_PRINT' && params.filename) {
+          await fetch(`${MOONRAKER_LOCAL}/printer/print/start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: params.filename })
+          });
+          switchTab('dashboard');
+        }
+      } catch (err) {}
     }
 
-    function confirmCancel() {
-      if (confirm('Вы уверены, что хотите остановить и отменить текущую печать?')) {
-        sendCommand('CANCEL');
-      }
+    // Jogging Controls
+    let currentJogStep = 10.0;
+    function setJogStep(step) {
+      triggerHaptic('light');
+      currentJogStep = step;
+      document.getElementById('stepSelectedLabel').innerText = `${step} мм`;
+      [0.1, 1.0, 10.0, 50.0].forEach(s => {
+        const id = s === 0.1 ? 'step-01' : (s === 1.0 ? 'step-1' : (s === 10.0 ? 'step-10' : 'step-50'));
+        const btn = document.getElementById(id);
+        if (btn) {
+          if (s === step) {
+            btn.className = 'btn-tactile py-2 rounded-xl text-xs font-bold border border-cyan-500/40 bg-cyan-500/20 text-cyan-400';
+          } else {
+            btn.className = 'btn-tactile py-2 rounded-xl text-xs font-bold border border-white/5 bg-surfaceCard text-slate-300';
+          }
+        }
+      });
     }
 
-    function confirmPowerOff() {
-      if (confirm('Запустить процедуру безопасного выключения? Сопло будет охлаждено до 45°C, после чего прозвучит сигнал.')) {
-        sendCommand('SAFE_POWER_OFF');
-      }
+    function jogMove(axis, dir) {
+      const dist = (dir * currentJogStep).toFixed(2);
+      sendCommand('MOVE_AXIS', { axis: axis, dist: dist });
     }
 
-    // Update individual screw dial (Крутилка со шкалой)
-    function setScrewDial(corner, dir, mins) {
-      const needle = document.getElementById('dialNeedle-' + corner);
-      const center = document.getElementById('dialCenter-' + corner);
-      const badge = document.getElementById('screw' + corner);
-      const text = document.getElementById('screwText' + corner);
-      const card = document.getElementById('card' + corner);
-      if (!needle || !badge || !text) return;
+    // Thermal Effects
+    function updateThermalEffects(heater, current, target) {
+      const card = document.getElementById(heater === 'hotend' ? 'hotendCard' : 'bedCard');
+      const iconBox = document.getElementById(heater === 'hotend' ? 'hotendIconBox' : 'bedIconBox');
+      const badge = document.getElementById(heater === 'hotend' ? 'hotendAnimBadge' : 'bedAnimBadge');
+      if (!card || !iconBox) return;
 
-      const m = parseInt(mins) || 0;
-      const deg = Math.min(360, m * 6); // 1 minute = 6 degrees (60 mins = 360 deg)
-      const rot = (dir === 'CCW') ? -deg : deg;
-
-      needle.setAttribute('transform', `rotate(${rot}, 50, 50)`);
-
-      if (m <= 2) {
-        // Ideal
-        if (card) card.className = 'flex flex-col items-center bg-emerald-950/20 p-2.5 rounded-2xl border border-emerald-500/30 transition-all duration-300';
-        badge.className = 'text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 mb-0.5';
-        badge.innerText = `${dir} 00:${m.toString().padStart(2, '0')} (${deg}°) ✓`;
-        text.innerText = 'Идеально! Не крутить';
-        text.className = 'text-[9px] text-emerald-400 font-medium text-center';
-        if (center) center.innerText = '✓';
-      } else if (m <= 8) {
-        // Minor adjustment
-        if (card) card.className = 'flex flex-col items-center bg-cyan-950/20 p-2.5 rounded-2xl border border-cyan-500/30 transition-all duration-300';
-        badge.className = 'text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 mb-0.5';
-        badge.innerText = `${dir} 00:${m.toString().padStart(2, '0')} (${deg}°)`;
-        text.innerText = (dir === 'CW' ? 'По часовой' : 'Против часовой') + ` ~${m} мин`;
-        text.className = 'text-[9px] text-cyan-400 font-medium text-center';
-        if (center) center.innerText = (dir === 'CW') ? '↻' : '↺';
+      if (target > 0 && current < (target - 2)) {
+        card.classList.remove('card-cooling');
+        card.classList.add('card-heating');
+        iconBox.innerHTML = '<span class="text-sm inline-block animate-flame">🔥</span>';
+        if (badge) {
+          badge.className = 'text-[8px] font-bold uppercase px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30';
+          badge.innerText = 'Нагрев';
+          badge.classList.remove('hidden');
+        }
+      } else if (target === 0 && current > 45) {
+        card.classList.remove('card-heating');
+        card.classList.add('card-cooling');
+        iconBox.innerHTML = '<span class="text-sm inline-block animate-breeze">💨</span>';
+        if (badge) {
+          badge.className = 'text-[8px] font-bold uppercase px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';
+          badge.innerText = 'Остывает';
+          badge.classList.remove('hidden');
+        }
       } else {
-        // Major tilt
-        if (card) card.className = 'flex flex-col items-center bg-amber-950/25 p-2.5 rounded-2xl border border-amber-500/40 transition-all duration-300';
-        badge.className = 'text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 mb-0.5';
-        badge.innerText = `${dir} 00:${m.toString().padStart(2, '0')} (${deg}°)`;
-        text.innerText = (dir === 'CW' ? 'По часовой' : 'Против часовой') + ` ~${m} мин`;
-        text.className = 'text-[9px] text-amber-400 font-medium text-center';
-        if (center) center.innerText = (dir === 'CW') ? '↻' : '↺';
+        card.classList.remove('card-heating', 'card-cooling');
+        if (badge) badge.classList.add('hidden');
+        if (heater === 'hotend') {
+          iconBox.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-orange-400"><path d="m14 4-2 2-2-2"/><path d="m14 8-2 2-2-2"/><path d="m14 12-2 2-2-2"/><circle cx="12" cy="18" r="4"/></svg>';
+        } else {
+          iconBox.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan-400"><path d="M2 12h20"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"/><path d="M4 6h16"/></svg>';
+        }
       }
     }
 
-    // Interactive Demo Cycle for testing the dials
-    let demoStep = 0;
-    function demoScrewsCycle() {
-      triggerHaptic('medium');
-      demoStep = (demoStep + 1) % 3;
-      const header = document.getElementById('screwsStatusHeader');
+    // Apply Telemetry Packet to UI
+    let lastPacketTs = 0;
+    function applyTelemetry(d) {
+      if (!d) return;
+      lastPacketTs = Date.now();
 
-      if (demoStep === 1) {
-        header.innerText = 'Замер: требуется подстройка';
-        header.className = 'text-[10px] text-amber-400 font-mono font-bold';
-        setScrewDial('RL', 'CW', 6);
-        setScrewDial('RR', 'CCW', 14);
-        setScrewDial('FR', 'CW', 9);
-      } else if (demoStep === 2) {
-        header.innerText = 'Замер: стол идеален! ✓';
-        header.className = 'text-[10px] text-emerald-400 font-mono font-bold';
-        setScrewDial('RL', 'CW', 1);
-        setScrewDial('RR', 'CCW', 1);
-        setScrewDial('FR', 'CW', 2);
-      } else {
-        header.innerText = 'Замер: исходные данные';
-        header.className = 'text-[10px] text-purple-400 font-mono';
-        setScrewDial('RL', 'CW', 3);
-        setScrewDial('RR', 'CCW', 8);
-        setScrewDial('FR', 'CW', 5);
-      }
-    }
-
-    // 1. Printer Connection and Power Status
-    function setPrinterStatus(statusType) {
+      // State & status
+      const state = (d.state || 'ready').toLowerCase();
       const dot = document.getElementById('statusDot');
       const sub = document.getElementById('statusSub');
       const badge = document.getElementById('printStateBadge');
-      const banner = document.getElementById('printerConnectionBanner');
-      const connDot = document.getElementById('connDot');
-      const connTitle = document.getElementById('connTitle');
-      const connBadge = document.getElementById('connBadge');
-      const connSubtitle = document.getElementById('connSubtitle');
 
-      const s = (statusType || 'online').toLowerCase();
-
-      // Update TV Backlight ambient indicator state
-      const tvDot = document.getElementById('tvStripColorDot');
-      const tvBadge = document.getElementById('tvStripBadge');
-      if (tvDot && tvBadge) {
-        if (s === 'offline' || s === 'power_off' || s === 'off') {
-          tvDot.className = 'w-3.5 h-3.5 rounded-full bg-rose-500 shadow-[0_0_12px_#ef4444]';
-          tvBadge.className = 'text-[9px] font-mono font-bold text-rose-400 px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/30';
-          tvBadge.innerText = '🔴 Красный 100% (Нет связи)';
-        } else if (s === 'disconnected' || s === 'error' || s === 'shutdown') {
-          tvDot.className = 'w-3.5 h-3.5 rounded-full bg-amber-500 shadow-[0_0_12px_#f59e0b]';
-          tvBadge.className = 'text-[9px] font-mono font-bold text-amber-400 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30';
-          tvBadge.innerText = '🟠 Оранжевый (Ошибка связи)';
-        } else if (s === 'printing') {
-          tvDot.className = 'w-3.5 h-3.5 rounded-full bg-cyan-400 shadow-[0_0_12px_#06b6d4] animate-pulse';
-          tvBadge.className = 'text-[9px] font-mono font-bold text-cyan-400 px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30';
-          tvBadge.innerText = '🔵 Голубой (Прогресс)';
-        } else if (s === 'ready' || s === 'online') {
-          tvDot.className = 'w-3.5 h-3.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#10b981]';
-          tvBadge.className = 'text-[9px] font-mono font-bold text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30';
-          tvBadge.innerText = '🟢 Зелёный 50% (В сети)';
-        } else {
-          // standby
-          tvDot.className = 'w-3.5 h-3.5 rounded-full bg-emerald-600 shadow-[0_0_8px_#059669]';
-          tvBadge.className = 'text-[9px] font-mono font-bold text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30';
-          tvBadge.innerText = '🟢 Зелёный 30% (Ожидание)';
-        }
-      }
-
-      if (s === 'offline' || s === 'power_off' || s === 'off') {
-        // 🔴 ВЫКЛЮЧЕН
-        if (dot) dot.className = 'w-3 h-3 rounded-full bg-rose-500 shadow-[0_0_12px_#ef4444]';
-        if (sub) sub.innerText = 'Принтер выключен (Офлайн)';
-        if (badge) {
-          badge.innerText = 'ВЫКЛЮЧЕН';
-          badge.className = 'text-[10px] uppercase font-bold tracking-wider text-rose-400 block mb-0.5';
-        }
-        if (banner) banner.className = 'flex items-center justify-between p-2.5 px-3 rounded-2xl bg-rose-950/25 border border-rose-500/40 mb-3.5 transition-all duration-300 shadow-md';
-        if (connDot) connDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_10px_#ef4444]';
-        if (connTitle) connTitle.innerText = 'ВЫКЛЮЧЕН';
-        if (connBadge) {
-          connBadge.innerText = 'ОФЛАЙН';
-          connBadge.className = 'text-[9px] uppercase px-1.5 py-0.5 rounded font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40';
-        }
-        if (connSubtitle) connSubtitle.innerText = 'Питание 24V обесточено • MCU не отвечает';
-        const pulseTag = document.getElementById('connPulseTag'); if (pulseTag) { pulseTag.innerText = 'ОФЛАЙН'; pulseTag.className = 'text-[9px] uppercase px-2.5 py-0.5 rounded-full font-mono font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30'; }
-      } else if (s === 'disconnected' || s === 'error' || s === 'shutdown') {
-        // 🟡 ПОТЕРЯ СВЯЗИ
-        if (dot) dot.className = 'w-3 h-3 rounded-full bg-amber-500 animate-pulse shadow-[0_0_12px_#f59e0b]';
-        if (sub) sub.innerText = 'Потеря связи с Klipper';
-        if (badge) {
-          badge.innerText = 'ПОТЕРЯ СВЯЗИ';
-          badge.className = 'text-[10px] uppercase font-bold tracking-wider text-amber-400 block mb-0.5';
-        }
-        if (banner) banner.className = 'flex items-center justify-between p-2.5 px-3 rounded-2xl bg-amber-950/25 border border-amber-500/40 mb-3.5 transition-all duration-300 shadow-md';
-        if (connDot) connDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse shadow-[0_0_10px_#f59e0b]';
-        if (connTitle) connTitle.innerText = 'ПОТЕРЯ СВЯЗИ';
-        if (connBadge) {
-          connBadge.innerText = 'ВНИМАНИЕ';
-          connBadge.className = 'text-[9px] uppercase px-1.5 py-0.5 rounded font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40';
-        }
-        if (connSubtitle) connSubtitle.innerText = 'Moonraker активен, но Klipper остановлен или потерял связь';
-        const pulseTag = document.getElementById('connPulseTag'); if (pulseTag) { pulseTag.innerText = 'СВЯЗЬ'; pulseTag.className = 'text-[9px] uppercase px-2.5 py-0.5 rounded-full font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30'; }
-      } else if (s === 'paused') {
-        // ⏸ НА ПАУЗЕ
-        if (dot) dot.className = 'w-3 h-3 rounded-full bg-amber-400 shadow-[0_0_12px_#fbbf24]';
-        if (sub) sub.innerText = 'В сети • Печать на паузе';
-        if (badge) {
-          badge.innerText = 'НА ПАУЗЕ';
-          badge.className = 'text-[10px] uppercase font-bold tracking-wider text-amber-300 block mb-0.5';
-        }
-        if (banner) banner.className = 'flex items-center justify-between p-2.5 px-3 rounded-2xl bg-amber-950/20 border border-amber-500/30 mb-3.5 transition-all duration-300 shadow-md';
-        if (connDot) connDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_10px_#fbbf24]';
-        if (connTitle) connTitle.innerText = 'НА ПАУЗЕ';
-        if (connBadge) {
-          connBadge.innerText = 'ПАУЗА';
-          connBadge.className = 'text-[9px] uppercase px-1.5 py-0.5 rounded font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40';
-        }
-        if (connSubtitle) connSubtitle.innerText = 'Печать временно приостановлена';
-        const pulseTag = document.getElementById('connPulseTag'); if (pulseTag) { pulseTag.innerText = 'ПАУЗА'; pulseTag.className = 'text-[9px] uppercase px-2.5 py-0.5 rounded-full font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30'; }
-      } else if (s === 'printing') {
-        // 🟢 ОНЛАЙН - ИДЁТ ПЕЧАТЬ
-        if (dot) dot.className = 'w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_12px_#10b981]';
-        if (sub) sub.innerText = 'В сети • Идёт печать';
-        if (badge) {
-          badge.innerText = 'ИДЁТ ПЕЧАТЬ';
-          badge.className = 'text-[10px] uppercase font-bold tracking-wider text-emerald-400 block mb-0.5';
-        }
-        if (banner) banner.className = 'flex items-center justify-between p-2.5 px-3 rounded-2xl bg-surface border border-surfaceBorder mb-3.5 transition-all duration-300 shadow-md';
-        if (connDot) connDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]';
-        if (connTitle) connTitle.innerText = 'ОНЛАЙН (ПЕЧАТЬ)';
-        if (connBadge) {
-          connBadge.innerText = 'АКТИВЕН';
-          connBadge.className = 'text-[9px] uppercase px-1.5 py-0.5 rounded font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
-        }
-        if (connSubtitle) connSubtitle.innerText = 'Klipper выполняет задание';
+      if (state === 'printing') {
+        dot.className = 'w-3.5 h-3.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_14px_#10b981]';
+        sub.innerText = 'Идёт печать...';
+        badge.innerText = 'Печать активна';
+        badge.className = 'text-[10px] uppercase font-bold tracking-wider text-emerald-400 block mb-0.5';
+      } else if (state === 'paused') {
+        dot.className = 'w-3.5 h-3.5 rounded-full bg-amber-400 shadow-[0_0_14px_#f59e0b]';
+        sub.innerText = 'Печать на паузе';
+        badge.innerText = 'Пауза';
+        badge.className = 'text-[10px] uppercase font-bold tracking-wider text-amber-400 block mb-0.5';
+      } else if (state === 'offline') {
+        dot.className = 'w-3.5 h-3.5 rounded-full bg-rose-500 shadow-[0_0_14px_#ef4444]';
+        sub.innerText = 'Принтер обесточен (24V ВЫКЛ)';
+        badge.innerText = 'Офлайн';
+        badge.className = 'text-[10px] uppercase font-bold tracking-wider text-rose-400 block mb-0.5';
       } else {
-        // 🟢 ОНЛАЙН - ГОТОВ
-        if (dot) dot.className = 'w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_12px_#10b981]';
-        if (sub) sub.innerText = 'В сети • Готов к печати';
-        if (badge) {
-          badge.innerText = 'РЕЖИМ ОЖИДАНИЯ (STANDBY)';
-          badge.className = 'text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5';
-        }
-        if (banner) banner.className = 'flex items-center justify-between p-2.5 px-3 rounded-2xl bg-surface border border-surfaceBorder mb-3.5 transition-all duration-300 shadow-md';
-        if (connDot) connDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]';
-        if (connTitle) connTitle.innerText = 'ОНЛАЙН';
-        if (connBadge) {
-          connBadge.innerText = 'ГОТОВ';
-          connBadge.className = 'text-[9px] uppercase px-1.5 py-0.5 rounded font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
-        }
-        if (connSubtitle) connSubtitle.innerText = 'Moonraker & Klipper активны';
-        const pulseTag = document.getElementById('connPulseTag'); if (pulseTag) { pulseTag.innerText = 'АКТИВЕН'; pulseTag.className = 'text-[9px] uppercase px-2.5 py-0.5 rounded-full font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'; }
+        dot.className = 'w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-[0_0_14px_#10b981]';
+        sub.innerText = 'Готов к печати';
+        badge.innerText = 'Режим ожидания';
+        badge.className = 'text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5';
       }
-    }
 
-    // 2. Dynamic Flame 🔥 & Cooling Wind 💨 Effects
-    function updateThermalEffects(type, cur, tar) {
-      const card = document.getElementById(type + 'Card');
-      const iconBox = document.getElementById(type + 'IconBox');
-      const badge = document.getElementById(type + 'AnimBadge');
-      const bar = document.getElementById(type + 'Bar');
-      if (!card || !iconBox || !badge || !bar) return;
+      // Temperatures
+      const hCur = parseFloat(d.hotend || 0);
+      const hTar = parseFloat(d.hotend_target || 0);
+      const bCur = parseFloat(d.bed || 0);
+      const bTar = parseFloat(d.bed_target || 0);
 
-      const current = parseFloat(cur) || 0;
-      const target = parseFloat(tar) || 0;
-      const coolThreshold = (type === 'hotend') ? 42 : 38;
+      document.getElementById('hotendTemp').innerHTML = `${hCur.toFixed(1)}<span class="text-xs font-normal text-slate-400">°C</span>`;
+      document.getElementById('hotendTarget').innerText = `/ ${Math.round(hTar)}°C`;
+      document.getElementById('hotendBar').style.width = Math.min(100, (hCur / 260) * 100) + '%';
 
-      card.classList.remove('card-heating', 'card-cooling');
-      badge.classList.add('hidden');
-      badge.className = 'text-[8px] font-bold uppercase px-1.5 py-0.5 rounded';
+      document.getElementById('bedTemp').innerHTML = `${bCur.toFixed(1)}<span class="text-xs font-normal text-slate-400">°C</span>`;
+      document.getElementById('bedTarget').innerText = `/ ${Math.round(bTar)}°C`;
+      document.getElementById('bedBar').style.width = Math.min(100, (bCur / 100) * 100) + '%';
 
-      if (target > 0 && current < target + 3) {
-        // 🔥 HEATING ANIMATION (Огонь)
-        card.classList.add('card-heating');
-        badge.classList.remove('hidden');
-        badge.classList.add('bg-orange-500/25', 'text-orange-400', 'border', 'border-orange-500/40', 'animate-pulse');
-        badge.innerText = '🔥 Нагрев';
-        iconBox.innerHTML = `
-          <svg class="w-3.5 h-3.5 text-orange-500 animate-flame" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 23c6.075 0 8-4.5 8-8.5 0-3.5-2.5-6.5-4-8-1.5 2.5-3.5 3-4.5 3-1 0-2-.5-2.5-1.5-.5 2-1 3.5-3 5.5-1.5 1.5-2 3.5-2 5.5 0 4 1.925 8.5 8 8.5z"/>
-          </svg>
-        `;
-        bar.className = 'h-full rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 shadow-[0_0_10px_#f97316] transition-all duration-300';
-      } else if (target === 0 && current > coolThreshold) {
-        // 💨 COOLING ANIMATION (Ветер)
-        card.classList.add('card-cooling');
-        badge.classList.remove('hidden');
-        badge.classList.add('bg-cyan-500/25', 'text-cyan-300', 'border', 'border-cyan-500/40');
-        badge.innerText = '💨 Остывает';
-        iconBox.innerHTML = `
-          <svg class="w-3.5 h-3.5 text-cyan-400 animate-breeze" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/>
-            <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
-            <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
-          </svg>
-        `;
-        bar.className = 'h-full rounded-full bg-gradient-to-r from-cyan-500 via-sky-400 to-blue-500 shadow-[0_0_10px_#06b6d4] transition-all duration-300';
-      } else {
-        // 💤 IDLE / STABLE
-        if (type === 'hotend') {
-          iconBox.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-orange-400"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-          `;
-          bar.className = 'h-full rounded-full bg-gradient-to-r from-amber-500 to-rose-500 transition-all duration-300';
+      updateThermalEffects('hotend', hCur, hTar);
+      updateThermalEffects('bed', bCur, bTar);
+
+      // Print progress
+      const pct = parseInt(d.progress || 0);
+      document.getElementById('printPercent').innerText = `${pct}%`;
+      document.getElementById('mainProgress').style.width = `${pct}%`;
+
+      if (d.filename) {
+        document.getElementById('currentFile').innerText = d.filename;
+      }
+      if (d.z !== undefined) {
+        document.getElementById('currentZ').innerText = `${parseFloat(d.z).toFixed(2)} мм`;
+      }
+      if (d.layer !== undefined && d.total_layers !== undefined) {
+        document.getElementById('layerInfo').innerText = `${d.layer} / ${d.total_layers}`;
+      }
+      if (d.time_left !== undefined && d.time_left > 0) {
+        const m = Math.round(d.time_left / 60);
+        document.getElementById('timeLeft').innerText = m > 60 ? `~${Math.floor(m/60)}ч ${m%60}м` : `~${m} мин`;
+      }
+
+      // Smart Plug & Wattage
+      if (d.plug) {
+        const pOn = d.plug.is_on;
+        const w = parseFloat(d.plug.power || 0).toFixed(1);
+        const v = parseFloat(d.plug.voltage || 230).toFixed(0);
+        const a = parseFloat(d.plug.amperage || 0).toFixed(2);
+
+        document.getElementById('socketWatts').innerText = `${w} Вт`;
+        document.getElementById('socketVolts').innerText = `${v} В`;
+        document.getElementById('socketAmps').innerText = `${a} А`;
+
+        const sDot = document.getElementById('socketDot');
+        const sW = document.getElementById('socketPowerW');
+        if (pOn) {
+          sDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]';
+          sW.innerText = `${w} Вт (ВКЛ)`;
+          sW.className = 'text-[9px] font-mono tabular-nums text-emerald-400 mt-0.5 block w-full text-left';
+          document.getElementById('smartSocketStatus').innerText = 'Питание принтера включено';
         } else {
-          iconBox.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan-400"><path d="M2 14h20M2 18h20M2 10h20"/></svg>
-          `;
-          bar.className = 'h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300';
+          sDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-700';
+          sW.innerText = 'ВЫКЛ';
+          sW.className = 'text-[9px] font-mono tabular-nums text-slate-500 mt-0.5 block w-full text-left';
+          document.getElementById('smartSocketStatus').innerText = 'Питание обесточено';
         }
+      }
+
+      // Climate
+      if (d.climate) {
+        if (d.climate.temp) document.getElementById('climateTemp').innerText = `${parseFloat(d.climate.temp).toFixed(1)}°C`;
+        if (d.climate.humidity) document.getElementById('climateHum').innerText = `${parseInt(d.climate.humidity)}%`;
+      }
+
+      // Lights
+      if (d.lights) {
+        updateLightIndicator('nozzle', d.lights.nozzle);
+        updateLightIndicator('frame', d.lights.frame);
       }
     }
 
-    // 3. Telemetry Sync from URL query params
-    function parseParams() {
-      const p = new URLSearchParams(window.location.search);
-      
-      let hotendCur = 0;
-      let hotendTar = 0;
-      let bedCur = 0;
-      let bedTar = 0;
-
-      if (p.has('hotend')) {
-        hotendCur = parseFloat(p.get('hotend'));
-        document.getElementById('hotendTemp').innerHTML = `${hotendCur.toFixed(1)}<span class="text-xs font-normal text-slate-400">°C</span>`;
-        document.getElementById('hotendBar').style.width = Math.min(100, (hotendCur / 260) * 100) + '%';
-      }
-      if (p.has('hotend_target')) {
-        hotendTar = parseFloat(p.get('hotend_target'));
-        document.getElementById('hotendTarget').innerText = `/ ${parseInt(hotendTar)}°C`;
-      }
-      if (p.has('bed')) {
-        bedCur = parseFloat(p.get('bed'));
-        document.getElementById('bedTemp').innerHTML = `${bedCur.toFixed(1)}<span class="text-xs font-normal text-slate-400">°C</span>`;
-        document.getElementById('bedBar').style.width = Math.min(100, (bedCur / 100) * 100) + '%';
-      }
-      if (p.has('bed_target')) {
-        bedTar = parseFloat(p.get('bed_target'));
-        document.getElementById('bedTarget').innerText = `/ ${parseInt(bedTar)}°C`;
-      }
-
-      // Update heating & cooling animations
-      updateThermalEffects('hotend', hotendCur, hotendTar);
-      updateThermalEffects('bed', bedCur, bedTar);
-
-      if (p.has('progress')) {
-        const pct = parseInt(p.get('progress'));
-        document.getElementById('printPercent').innerText = `${pct}%`;
-        document.getElementById('mainProgress').style.width = `${pct}%`;
-      }
-      if (p.has('file') && p.get('file')) {
-        document.getElementById('currentFile').innerText = decodeURIComponent(p.get('file'));
-      }
-
-      let st = (p.get('state') || p.get('status') || '').toLowerCase();
-      // Physical sanity trigger: If hotend and bed temperatures are 0.0, the printer is definitely unpowered or disconnected!
-      if (!st || st === 'standby' || st === 'ready' || st === 'online') {
-        if (hotendCur <= 0.0 && bedCur <= 0.0) {
-          st = 'offline';
-        } else if (!st) {
-          st = 'online';
-        }
-      }
-      setPrinterStatus(st);
-
-      // Microclimate query params
-      if (p.has('room_t') && p.get('room_t') !== '0') {
-        document.getElementById('climateTemp').innerText = parseFloat(p.get('room_t')).toFixed(1) + '°C';
-      }
-      if (p.has('room_h') && p.get('room_h') !== '0') {
-        document.getElementById('climateHum').innerText = parseInt(p.get('room_h')) + '%';
-      }
-      if (p.has('queue_len')) {
-        const ql = parseInt(p.get('queue_len'));
-        if (ql > 0) {
-          document.getElementById('queueStatusText').innerText = `В очереди ожидает ${ql} файл(ов). Готов к автозапуску.`;
-        }
-      }
-
-      // Lights sync from URL
-      if (p.has('light_nozzle')) {
-        const isOn = (p.get('light_nozzle') === '1' || p.get('light_nozzle') === 'true');
-        lightState.nozzle = isOn;
-        const dot = document.getElementById('lightNozzleDot');
-        const status = document.getElementById('lightNozzleStatus');
-        if (dot && status) {
-          dot.className = isOn ? 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]' : 'w-2.5 h-2.5 rounded-full bg-slate-700';
-          status.innerText = isOn ? 'Включено' : 'Выключено';
-          status.className = isOn ? 'text-[9px] text-emerald-400 font-bold' : 'text-[9px] text-slate-500';
-        }
-      }
-      if (p.has('light_frame')) {
-        const isOn = (p.get('light_frame') === '1' || p.get('light_frame') === 'true');
-        lightState.frame = isOn;
-        const dot = document.getElementById('lightFrameDot');
-        const status = document.getElementById('lightFrameStatus');
-        if (dot && status) {
-          dot.className = isOn ? 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]' : 'w-2.5 h-2.5 rounded-full bg-slate-700';
-          status.innerText = isOn ? 'Включено' : 'Выключено';
-          status.className = isOn ? 'text-[9px] text-emerald-400 font-bold' : 'text-[9px] text-slate-500';
-        }
+    // Dual Lights
+    let lightState = { nozzle: false, frame: false };
+    function updateLightIndicator(zone, isOn) {
+      lightState[zone] = isOn;
+      const isNozzle = (zone === 'nozzle');
+      const dot = document.getElementById(isNozzle ? 'lightNozzleDot' : 'lightFrameDot');
+      const status = document.getElementById(isNozzle ? 'lightNozzleStatus' : 'lightFrameStatus');
+      if (isOn) {
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]';
+        status.innerText = 'Вкл';
+        status.className = 'text-[9px] text-emerald-400 font-bold mt-0.5 block w-full text-left';
+      } else {
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-slate-700';
+        status.innerText = 'Выкл';
+        status.className = 'text-[9px] text-slate-500 mt-0.5 block w-full text-left';
       }
     }
 
-    function refreshData() {
-      const icon = document.getElementById('refreshIcon');
-      icon.classList.add('animate-spin');
-      setTimeout(() => icon.classList.remove('animate-spin'), 600);
-      sendCommand('REFRESH_STATUS');
+    function toggleLight(zone) {
+      triggerHaptic('medium');
+      const next = !lightState[zone];
+      updateLightIndicator(zone, next);
+      sendCommand(zone === 'nozzle' ? (next ? 'LIGHT_NOZZLE_ON' : 'LIGHT_NOZZLE_OFF') : (next ? 'LIGHT_FRAME_ON' : 'LIGHT_FRAME_OFF'));
     }
 
-    // 4. Dynamic Models Library & Microclimate Fallback Loader
-    async function loadFilesCatalog() {
-      const container = document.getElementById('filesListContainer');
-      const badge = document.getElementById('filesCountBadge');
-      
+    function togglePowerSocket() {
+      triggerHaptic('medium');
+      openPowerModal();
+    }
+
+    // Live Telemetry Streaming (SSE + Raw Polling Fallback)
+    const NTFY_TELEMETRY_TOPIC = 'myender_kamelhin_telemetry_82737';
+    let sseSource = null;
+
+    function initLiveTelemetryStream() {
       try {
-        const resp = await fetch('files.json?t=' + Date.now());
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        const data = await resp.json();
-        
-        // Handle climate & printer data from files.json fallback
-        if (data && !Array.isArray(data)) {
-          if (data.climate) {
-            if (data.climate.temp) {
-              document.getElementById('climateTemp').innerText = parseFloat(data.climate.temp).toFixed(1) + '°C';
-            }
-            if (data.climate.humidity) {
-              document.getElementById('climateHum').innerText = parseInt(data.climate.humidity) + '%';
-            }
-            if (data.climate.note) {
-              document.getElementById('climateNote').innerText = data.climate.note;
-            }
-          }
-          if (data.printer && !window.location.search.includes('state=')) {
-            setPrinterStatus(data.printer.state || 'online');
-            if (data.printer.hotend !== undefined) {
-              updateThermalEffects('hotend', data.printer.hotend, data.printer.hotend_target || 0);
-            }
-            if (data.printer.bed !== undefined) {
-              updateThermalEffects('bed', data.printer.bed, data.printer.bed_target || 0);
-            }
-          }
-        }
+        if (sseSource) sseSource.close();
+        sseSource = new EventSource(`https://ntfy.sh/${NTFY_TELEMETRY_TOPIC}/sse`);
 
-        const files = Array.isArray(data) ? data : (data.files || []);
-        badge.innerText = `${files.length} моделей`;
-        if (files.length === 0) {
-          container.innerHTML = '<div class="p-6 text-center text-slate-500 text-xs bg-surface rounded-2xl border border-surfaceBorder">В памяти Klipper нет файлов .gcode</div>';
-          return;
-        }
+        sseSource.onopen = () => {
+          document.getElementById('liveStreamBadge').className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-mono font-bold text-emerald-400';
+          document.getElementById('liveStreamText').innerText = 'LIVE';
+        };
 
-        let html = '';
-        files.forEach(file => {
-          const thumbHtml = file.thumbnail
-            ? `<img src="${file.thumbnail}" alt="3D" class="w-16 h-16 rounded-xl object-contain bg-slate-950 p-1 border border-surfaceBorder shrink-0" onerror="this.onerror=null; this.src=''; this.className='hidden'">`
-            : `<div class="w-16 h-16 rounded-xl bg-slate-950 border border-surfaceBorder flex items-center justify-center text-slate-600 shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>`;
+        sseSource.onmessage = (e) => {
+          try {
+            const raw = JSON.parse(e.data);
+            const msg = raw.message ? JSON.parse(raw.message) : raw;
+            applyTelemetry(msg);
+            const ping = Date.now() - (msg.ts ? msg.ts * 1000 : Date.now());
+            document.getElementById('livePing').innerText = `${Math.max(20, Math.min(999, Math.round(ping)))}ms`;
+          } catch (err) {}
+        };
 
-          html += `
-            <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder shadow-md hover:border-slate-700 transition">
-              <div class="flex gap-3 mb-2.5">
-                ${thumbHtml}
-                <div class="flex-1 min-w-0">
-                  <h3 class="text-xs font-bold text-white truncate mb-1" title="${file.filename}">${file.displayName}</h3>
-                  <div class="flex flex-wrap gap-1.5 text-[10px] text-slate-300">
-                    <span class="px-1.5 py-0.5 rounded bg-slate-900 border border-surfaceBorder/80 font-mono text-cyan-400">⏱ ${file.time}</span>
-                    <span class="px-1.5 py-0.5 rounded bg-slate-900 border border-surfaceBorder/80 text-amber-400">🧵 ${file.filamentWeight} (${file.material})</span>
-                    <span class="px-1.5 py-0.5 rounded bg-slate-900 border border-surfaceBorder/80 text-slate-400 font-mono">📦 ${file.sizeMb} МБ</span>
-                  </div>
-                  <div class="flex items-center gap-2 mt-1 text-[9px] text-slate-500">
-                    <span>Слои: ${file.totalLayers}</span>
-                    <span>•</span>
-                    <span>Стол ${file.bedTemp}° / Сопло ${file.nozzleTemp}°</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Card Action Buttons -->
-              <div class="grid grid-cols-2 gap-2 pt-2 border-t border-surfaceBorder/60">
-                <button onclick="startPrintDirect('${file.filename}')" class="py-1.5 px-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 btn-tactile">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  Напечатать
-                </button>
-                <button onclick="addToQueue('${file.filename}')" class="py-1.5 px-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 btn-tactile">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-                  В очередь
-                </button>
-              </div>
-            </div>
-          `;
-        });
-        container.innerHTML = html;
-
-        // Auto-link active model thumbnail in Dashboard
-        const curFileEl = document.getElementById('currentFile');
-        const curName = (curFileEl?.innerText || '').trim();
-        const activeThumb = document.getElementById('activeModelThumb');
-        if (activeThumb) {
-          let match = files.find(f => curName && curName !== 'Файл не выбран' && (f.filename === curName || curName.includes(f.displayName) || f.displayName.includes(curName)));
-          if (!match && files.length > 0) {
-            match = files[0];
-          }
-          if (match && match.thumbnail) {
-            activeThumb.src = match.thumbnail;
-            activeThumb.classList.remove('hidden');
-            if (!curName || curName === 'Файл не выбран') {
-              if (curFileEl) curFileEl.innerText = match.displayName || match.filename;
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Catalog load error:', err);
-        container.innerHTML = `
-          <div class="p-4 bg-surface rounded-2xl border border-surfaceBorder text-center">
-            <p class="text-xs text-rose-400 font-medium mb-1">Ошибка загрузки каталога</p>
-            <p class="text-[10px] text-slate-500 mb-2">Проверьте подключение к сети или обновите список</p>
-            <button onclick="loadFilesCatalog()" class="px-3 py-1 bg-slate-800 text-xs text-slate-300 rounded-lg">Повторить</button>
-          </div>
-        `;
-      }
+        sseSource.onerror = () => {
+          document.getElementById('liveStreamBadge').className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[10px] font-mono font-bold text-amber-400';
+          document.getElementById('liveStreamText').innerText = 'RECONNECT';
+        };
+      } catch (err) {}
     }
 
-    function startPrintDirect(fname) {
-      if (confirm(`Запустить печать модели "${fname}" прямо сейчас?`)) {
-        sendCommand('START_PRINT', { filename: fname });
+    // Fast Raw Polling
+    async function pollRawTelemetry() {
+      try {
+        const resp = await fetch(`https://ntfy.sh/${NTFY_TELEMETRY_TOPIC}/raw?poll=1`, { cache: 'no-store' });
+        if (resp.ok) {
+          const text = await resp.text();
+          const lines = text.trim().split('\n').filter(l => l.length > 0);
+          if (lines.length > 0) {
+            const lastMsg = JSON.parse(lines[lines.length - 1]);
+            applyTelemetry(lastMsg);
+          }
+        }
+      } catch (e) {}
+    }
+
+    function manualRefreshTelemetry() {
+      triggerHaptic('medium');
+      const icon = document.getElementById('refreshIcon');
+      if (icon) icon.classList.add('animate-spin');
+      pollRawTelemetry().finally(() => {
+        setTimeout(() => icon?.classList.remove('animate-spin'), 600);
+      });
+      showToast('🔄 Телеметрия обновлена');
+    }
+
+    // Camera Live Refresh
+    function refreshCameraSnapshot() {
+      triggerHaptic('light');
+      const img = document.getElementById('cameraLiveFeed');
+      if (img) {
+        img.src = `http://192.168.1.21:8889/snapshot?t=${Date.now()}`;
+      }
+      showToast('📷 Снимок обновлён');
+    }
+
+    // Stop Modal
+    function openStopModal() {
+      triggerHaptic('warning');
+      document.getElementById('stopModalBackdrop').classList.add('show');
+    }
+    function closeStopModal() {
+      triggerHaptic('light');
+      document.getElementById('stopModalBackdrop').classList.remove('show');
+    }
+    function confirmStopPrint() {
+      closeStopModal();
+      sendCommand('CANCEL');
+    }
+
+    // Start Print Modal
+    let pendingPrintFile = null;
+    function openStartModal(filename, displayName, timeStr, weightStr, mat, thumb) {
+      triggerHaptic('medium');
+      pendingPrintFile = filename;
+      document.getElementById('startModalName').innerText = displayName || filename;
+      document.getElementById('startModalDetails').innerText = `⏱ ${timeStr || '--'} • ⚖️ ${weightStr || '--'}`;
+      document.getElementById('startModalMat').innerText = mat || 'G-CODE';
+      
+      const tImg = document.getElementById('startModalThumb');
+      if (thumb) {
+        tImg.src = thumb;
+        tImg.classList.remove('hidden');
+      } else {
+        tImg.classList.add('hidden');
+      }
+      document.getElementById('startModalBackdrop').classList.add('show');
+    }
+    function closeStartModal() {
+      triggerHaptic('light');
+      document.getElementById('startModalBackdrop').classList.remove('show');
+    }
+    function confirmStartPrint() {
+      closeStartModal();
+      if (pendingPrintFile) {
+        sendCommand('START_PRINT', { filename: pendingPrintFile });
         switchTab('dashboard');
       }
     }
 
-    function addToQueue(fname) {
-      sendCommand('QUEUE_ADD', { filename: fname });
-      alert(`Файл "${fname}" добавлен в очередь печати!`);
+    // Power Off Modal
+    function openPowerModal() {
+      triggerHaptic('warning');
+      document.getElementById('powerModalBackdrop').classList.add('show');
+    }
+    function closePowerModal() {
+      triggerHaptic('light');
+      document.getElementById('powerModalBackdrop').classList.remove('show');
+    }
+    function executeSafePowerOff() {
+      closePowerModal();
+      sendCommand('SAFE_POWER_OFF');
+    }
+    function executeForcePowerOff() {
+      closePowerModal();
+      sendCommand('POWER_SOCKET_OFF');
     }
 
-    parseParams();
+    // Files Catalog Loader (Loads real 3D thumbnails from files.json)
+    async function loadFilesCatalog() {
+      const container = document.getElementById('filesContainer');
+      try {
+        const resp = await fetch('files.json?t=' + Date.now());
+        if (!resp.ok) throw new Error('Catalog fetch error');
+        const files = await resp.json();
+        
+        if (!files || files.length === 0) {
+          container.innerHTML = '<div class="p-8 text-center text-slate-500 text-xs">Файлы не найдены. Загрузите .gcode через Mainsail или отправьте боту.</div>';
+          return;
+        }
+
+        container.innerHTML = files.map(f => `
+          <div class="bg-surface rounded-2xl p-3 border border-surfaceBorder hover:border-white/20 transition-all duration-200 flex items-center justify-between gap-3 shadow-md">
+            <div class="w-14 h-14 rounded-xl bg-black/60 p-1 border border-white/10 shrink-0 flex items-center justify-center overflow-hidden">
+              ${f.thumbnail ? `<img src="${f.thumbnail}" class="w-full h-full object-contain" alt="3D">` : `<span class="text-xl">🧊</span>`}
+            </div>
+            <div class="flex-1 truncate">
+              <h3 class="text-xs font-bold text-white truncate" title="${f.filename}">${f.displayName || f.filename}</h3>
+              <div class="flex items-center gap-2 text-[10px] text-slate-400 mt-1 font-mono tabular-nums">
+                <span class="text-emerald-400 font-bold">${f.time || '--'}</span>
+                <span>•</span>
+                <span>${f.filamentWeight || '--'}</span>
+                <span>•</span>
+                <span class="text-slate-500">${f.material || 'PETG'}</span>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1.5 shrink-0">
+              <button onclick="openStartModal('${f.filename}', '${(f.displayName || f.filename).replace(/'/g, "\\'")}', '${f.time || ''}', '${f.filamentWeight || ''}', '${f.material || ''}', '${f.thumbnail ? f.thumbnail.substring(0, 100) : ''}')" class="btn-tactile px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 font-bold text-xs border border-emerald-500/30" style="min-height:36px;">
+                Печать
+              </button>
+              <button onclick="sendCommand('QUEUE_ADD', { filename: '${f.filename}' })" class="btn-tactile px-3 py-1 rounded-lg bg-surfaceCard text-slate-400 hover:text-slate-200 font-medium text-[10px] border border-white/5" style="min-height:28px;">
+                В очередь
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        container.innerHTML = '<div class="p-6 text-center text-rose-400 text-xs">Не удалось загрузить файлы. Проверьте соединение.</div>';
+      }
+    }
+
+    // Startup Initialization
+    initLiveTelemetryStream();
+    pollRawTelemetry();
+    setInterval(pollRawTelemetry, 3500);
     loadFilesCatalog();
 
-    // Autonomous 1-second live telemetry polling on Redmi screen (when running outside Telegram)
-    if (!Boolean(window.Telegram?.WebApp?.initData) && !Boolean(window.maxBridge)) {
-      async function pollLocalMoonraker() {
-        try {
-          const resp = await fetch('http://127.0.0.1:7125/printer/objects/query?webhooks&print_stats&display_status&extruder&heater_bed&toolhead', { cache: 'no-store' });
-          if (resp.ok) {
-            const data = await resp.json();
-            const st = data?.result?.status || {};
-            const wh = st.webhooks || {};
-            const ext = st.extruder || {};
-            const bed = st.heater_bed || {};
-            const ps = st.print_stats || {};
-            const ds = st.display_status || {};
-
-            const hCur = ext.temperature || 0;
-            const hTar = ext.target || 0;
-            const bCur = bed.temperature || 0;
-            const bTar = bed.target || 0;
-            const progress = Math.round((ds.progress || 0) * 100);
-
-            const whState = (wh.state || '').toLowerCase();
-            const whMsg = (wh.state_message || '').toLowerCase();
-
-            let finalState = 'online';
-            if (whState === 'error' || whState === 'shutdown' || whState === 'disconnected' || (hCur <= 0 && bCur <= 0)) {
-              if (whMsg.includes('mcu') || whMsg.includes('connect') || (hCur <= 0 && bCur <= 0)) {
-                finalState = 'offline';
-              } else {
-                finalState = 'disconnected';
-              }
-            } else if (whState === 'ready') {
-              const pState = ps.state || 'standby';
-              finalState = pState;
-            }
-
-            document.getElementById('hotendTemp').innerHTML = `${hCur.toFixed(1)}<span class="text-xs font-normal text-slate-400">°C</span>`;
-            document.getElementById('hotendTarget').innerText = `/ ${Math.round(hTar)}°C`;
-            document.getElementById('hotendBar').style.width = Math.min(100, (hCur / 260) * 100) + '%';
-
-            document.getElementById('bedTemp').innerHTML = `${bCur.toFixed(1)}<span class="text-xs font-normal text-slate-400">°C</span>`;
-            document.getElementById('bedTarget').innerText = `/ ${Math.round(bTar)}°C`;
-            document.getElementById('bedBar').style.width = Math.min(100, (bCur / 100) * 100) + '%';
-
-            document.getElementById('printPercent').innerText = `${progress}%`;
-            document.getElementById('mainProgress').style.width = `${progress}%`;
-
-            if (ps.filename) {
-              document.getElementById('currentFile').innerText = ps.filename;
-            }
-
-            setPrinterStatus(finalState);
-            updateThermalEffects('hotend', hCur, hTar);
-            updateThermalEffects('bed', bCur, bTar);
-          } else {
-            setPrinterStatus('offline');
-          }
-        } catch (e) {
-          setPrinterStatus('offline');
-        }
-      }
-      setInterval(pollLocalMoonraker, 1500);
-      pollLocalMoonraker();
-    }
   </script>
 </body>
 </html>
