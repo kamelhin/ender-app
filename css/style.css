@@ -53,7 +53,7 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   padding-top: max(12px, var(--safe-top));
-  padding-bottom: max(96px, calc(var(--safe-bottom) + 82px));
+  padding-bottom: max(140px, calc(var(--safe-bottom) + 120px)) !important;
 }
 
 /* Tabular numbers for temperatures, coordinates, timers */
