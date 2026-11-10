@@ -912,6 +912,52 @@
         xhr.send(formData);
       });
     }
+
+    // =========================================================================
+    // ADVANCED SERVICE & BOT MACROS
+    // =========================================================================
+    async setFlow(pct) {
+      const val = parseInt(pct) || 100;
+      return this.sendGcode(`M221 S${val}`);
+    }
+
+    async loadFilament() {
+      return this.sendGcode('LOAD_FILAMENT');
+    }
+
+    async unloadFilament() {
+      return this.sendGcode('UNLOAD_FILAMENT');
+    }
+
+    async prepareBed() {
+      return this.sendGcode('PREPARE_BED');
+    }
+
+    async runBedMesh() {
+      return this.sendGcode('BED_MESH_CALIBRATE');
+    }
+
+    async playSong(song) {
+      if (song === 'mario') {
+        return this.sendGcode('SONG_MARIO');
+      } else if (song === 'star_wars' || song === 'imperial') {
+        return this.sendGcode('SONG_STAR_WARS');
+      }
+      return this.sendGcode('M300 S1000 P200');
+    }
+
+    async restartMoonraker() {
+      return fetch(`${this.host}/server/restart`, { method: 'POST' });
+    }
+
+    async toggleLight(channel) {
+      if (channel === 'model') {
+        return this.sendGcode('TOGGLE_LIGHT_MODEL');
+      } else if (channel === 'bed') {
+        return this.sendGcode('TOGGLE_LIGHT_BED');
+      }
+      return this.sendGcode('TOGGLE_LIGHTS');
+    }
   }
 
   return KlipperAPI;
