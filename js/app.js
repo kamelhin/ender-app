@@ -1157,6 +1157,60 @@
     initApp();
   }
 
+  function loadFilament() {
+    haptic('medium');
+    showToast('🧵 Загрузка нити запущена...');
+    window.klipperApi.loadFilament().catch(() => {});
+  }
+
+  function unloadFilament() {
+    haptic('medium');
+    showToast('✂️ Выгрузка нити запущена...');
+    window.klipperApi.unloadFilament().catch(() => {});
+  }
+
+  function prepareBed() {
+    haptic('light');
+    showToast('🧽 Очистка стола и сопла...');
+    window.klipperApi.prepareBed().catch(() => {});
+  }
+
+  function firmwareRestart() {
+    haptic('heavy');
+    showToast('🔄 Перезапуск Klipper...');
+    window.klipperApi.firmwareRestart().catch(() => {});
+  }
+
+  function restartMoonraker() {
+    haptic('heavy');
+    showToast('🔄 Перезапуск Moonraker...');
+    window.klipperApi.restartMoonraker().catch(() => {});
+  }
+
+  function toggleLightChannel(ch) {
+    haptic('medium');
+    showToast(`💡 Подсветка (${ch}) переключена`);
+    window.klipperApi.toggleLight(ch).catch(() => {});
+  }
+
+  function triggerResurrect() {
+    haptic('heavy');
+    showToast('🩹 Запуск спасения печати...');
+    window.klipperApi.sendGcode('RESURRECT_PRINT').catch(() => {});
+  }
+
+  function playSong(song) {
+    haptic('medium');
+    showToast(`🎵 Зуммер: ${song}`);
+    window.klipperApi.playSong(song).catch(() => {});
+  }
+
+  function setFlow(pct) {
+    haptic('medium');
+    showToast(`⚡ Поток M221: ${pct}%`);
+    window.klipperApi.setFlow(pct).catch(() => {});
+  }
+
   // =========================================================================
   // EXPORT GLOBAL HANDLERS TO WINDOW SCOPE
   // =========================================================================
@@ -1169,10 +1223,19 @@
   window.adjustZOffset = adjustZOffset;
   window.setFanSpeed = setFanSpeed;
   window.setSpeedFactor = setSpeedFactor;
+  window.setFlow = setFlow;
   window.setJogStep = setJogStep;
   window.jogMove = jogMove;
   window.homeAxes = homeAxes;
   window.extrudeFilament = extrudeFilament;
+  window.loadFilament = loadFilament;
+  window.unloadFilament = unloadFilament;
+  window.prepareBed = prepareBed;
+  window.firmwareRestart = firmwareRestart;
+  window.restartMoonraker = restartMoonraker;
+  window.toggleLightChannel = toggleLightChannel;
+  window.triggerResurrect = triggerResurrect;
+  window.playSong = playSong;
   window.runBedMeshCalibrate = runBedMeshCalibrate;
   window.runScrewsTiltCalculate = runScrewsTiltCalculate;
   window.loadFilesCatalog = loadFilesCatalog;
