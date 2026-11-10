@@ -1407,6 +1407,24 @@
     }
 
     /**
+     * Public Method: setTheme(theme)
+     * Dynamically shifts background color between Obsidian Dark and Pearl Light
+     */
+    setTheme(theme) {
+      if (!this.scene) return;
+      const isLight = (theme === 'light');
+      const bgHex = isLight ? 0xE2E8F0 : (this.options.backgroundColor || 0x06090e);
+      this.scene.background = new THREE.Color(bgHex);
+      if (this.scene.fog) {
+        this.scene.fog.color = new THREE.Color(bgHex);
+      }
+      if (this.renderer) {
+        this.renderer.setClearColor(bgHex, 1);
+      }
+      this._requestWakeup();
+    }
+
+    /**
      * Public Method: destroy()
      * Completely disposes Three.js memory, buffers, materials & event listeners.
      */
