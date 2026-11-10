@@ -26,9 +26,60 @@
   let pendingPrintFilename = null;
   let isNightVisionActive = false;
   let nozzleLightState = false;
+  let currentTheme = localStorage.getItem('ender_theme') || 'dark';
 
   // Global Instances
   window.app = window.app || {};
+
+  // =========================================================================
+  // THEME MANAGEMENT (PEARL LIGHT / OBSIDIAN LUXURY)
+  // =========================================================================
+  function applyTheme(theme) {
+    currentTheme = theme;
+    localStorage.setItem('ender_theme', theme);
+    const htmlEl = document.documentElement;
+    const bodyEl = document.body;
+    const iconEl = document.getElementById('themeIcon');
+
+    if (theme === 'light') {
+      htmlEl.classList.remove('dark');
+      htmlEl.classList.add('light');
+      bodyEl.classList.remove('dark');
+      bodyEl.classList.add('light');
+      if (iconEl) iconEl.textContent = '🌙';
+      if (tg && typeof tg.setHeaderColor === 'function') {
+        try { tg.setHeaderColor('#F8FAFC'); } catch (e) {}
+      }
+      if (tg && typeof tg.setBackgroundColor === 'function') {
+        try { tg.setBackgroundColor('#F1F5F9'); } catch (e) {}
+      }
+      if (window.viewer3D && typeof window.viewer3D.setTheme === 'function') {
+        window.viewer3D.setTheme('light');
+      }
+    } else {
+      htmlEl.classList.remove('light');
+      htmlEl.classList.add('dark');
+      bodyEl.classList.remove('light');
+      bodyEl.classList.add('dark');
+      if (iconEl) iconEl.textContent = '☀️';
+      if (tg && typeof tg.setHeaderColor === 'function') {
+        try { tg.setHeaderColor('#06080D'); } catch (e) {}
+      }
+      if (tg && typeof tg.setBackgroundColor === 'function') {
+        try { tg.setBackgroundColor('#06080D'); } catch (e) {}
+      }
+      if (window.viewer3D && typeof window.viewer3D.setTheme === 'function') {
+        window.viewer3D.setTheme('dark');
+      }
+    }
+  }
+
+  function toggleTheme() {
+    haptic('light');
+    const nextTheme = (currentTheme === 'dark' ? 'light' : 'dark');
+    applyTheme(nextTheme);
+    showToast(nextTheme === 'light' ? '☀️ Дневная тема (Pearl Light)' : '🌙 Ночная тема (Obsidian Luxury)');
+  }
 
   // =========================================================================
   // TELEGRAM WEBAPP SDK INITIALIZATION
@@ -40,13 +91,8 @@
       tg.ready();
       tg.expand();
 
-      // Setup dark theme styles to match Obsidian Luxury palette
-      if (typeof tg.setHeaderColor === 'function') {
-        tg.setHeaderColor('#06080D');
-      }
-      if (typeof tg.setBackgroundColor === 'function') {
-        tg.setBackgroundColor('#06080D');
-      }
+      // Apply initial header/background color based on active theme
+      applyTheme(currentTheme);
 
       // Enable closing confirmation if print is currently running
       if (typeof tg.enableClosingConfirmation === 'function') {
@@ -1070,12 +1116,20 @@
     if (m) m.classList.remove('show');
   }
 
+  async function powerOnPrinter() {
+    haptic('heavy');
+    showToast('⚡ Подано питание 220V! Подключение Klipper...', 'success', 5000);
+    try {
+      await window.klipperApi.powerOn();
+    } catch (e) {}
+  }
+
   async function executeSafePowerOff() {
     haptic('warning');
     closePowerModal();
     showToast('🛡️ Безопасное выключение: охлаждение сопла...', 'info', 4000);
     try {
-      await window.klipperApi.sendGcode('SAFE_POWER_OFF');
+      await window.klipperApi.powerOff(true);
     } catch (e) {}
   }
 
@@ -1084,7 +1138,7 @@
     closePowerModal();
     showToast('⚡ Обесточивание розетки...', 'warning');
     try {
-      await window.klipperApi.sendGcode('POWER_SOCKET_OFF');
+      await window.klipperApi.powerOff(false);
     } catch (e) {}
   }
 
@@ -1092,6 +1146,9 @@
   // BOOTSTRAP ON DOM READY
   // =========================================================================
   function initApp() {
+    // 0. Initial Theme Setup
+    applyTheme(currentTheme);
+
     // 1. Telegram SDK
     initTelegramWebApp();
 
@@ -1264,5 +1321,8 @@
   window.closePowerModal = closePowerModal;
   window.executeSafePowerOff = executeSafePowerOff;
   window.executeForcePowerOff = executeForcePowerOff;
+  window.powerOnPrinter = powerOnPrinter;
+  window.toggleTheme = toggleTheme;
+  window.applyTheme = applyTheme;
 
 })(window, document);
