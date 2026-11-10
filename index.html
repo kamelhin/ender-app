@@ -36,7 +36,7 @@
   <!-- Atelier OS Ultra-Luxury Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="p-3 max-w-[480px] mx-auto min-h-screen flex flex-col justify-between">
+<body class="p-3 max-w-[480px] mx-auto min-h-screen block">
 
   <!-- ========================================================================= -->
   <!-- FLOATING TOAST NOTIFICATION -->
@@ -227,18 +227,22 @@
         <!-- One-Tap Preheat Profiles -->
         <div>
           <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-2">Быстрый преднагрев</span>
-          <div class="grid grid-cols-3 gap-2">
+          <div class="grid grid-cols-4 gap-1.5">
             <button onclick="preheat('PETG')" class="btn-tactile p-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-bold text-xs flex flex-col items-center">
               <span>PETG</span>
-              <span class="text-[9px] font-normal text-amber-400/80">235° / 78°</span>
+              <span class="text-[9px] font-normal text-amber-400/80">235°/78°</span>
             </button>
             <button onclick="preheat('PLA')" class="btn-tactile p-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 font-bold text-xs flex flex-col items-center">
               <span>PLA</span>
-              <span class="text-[9px] font-normal text-cyan-400/80">205° / 60°</span>
+              <span class="text-[9px] font-normal text-cyan-400/80">205°/60°</span>
+            </button>
+            <button onclick="preheat('STANDBY')" class="btn-tactile p-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex flex-col items-center">
+              <span>🛋 Дежурн</span>
+              <span class="text-[9px] font-normal text-emerald-400/80">140°/50°</span>
             </button>
             <button onclick="preheat('COOLDOWN')" class="btn-tactile p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-300 font-bold text-xs flex flex-col items-center">
-              <span>❄️ Охладить</span>
-              <span class="text-[9px] font-normal text-slate-400">0° / 0°</span>
+              <span>❄️ Стоп</span>
+              <span class="text-[9px] font-normal text-slate-400">0°/0°</span>
             </button>
           </div>
         </div>
@@ -273,6 +277,9 @@
           </button>
         </div>
       </div>
+
+      <!-- Breathing spacer for fixed bottom nav -->
+      <div class="h-28 shrink-0 w-full" aria-hidden="true"></div>
 
     </div>
 
@@ -382,14 +389,118 @@
         </div>
       </div>
 
+      <!-- Breathing spacer for fixed bottom nav -->
+      <div class="h-28 shrink-0 w-full" aria-hidden="true"></div>
+
     </div>
 
     <!-- ======================================================================= -->
-    <!-- TAB 3: СЕРВИС & ВИНТЫ (CALIBRATION & SCREWS TILT CALCULATE) -->
+    <!-- TAB 3: СЕРВИС & КЛИППЕР (ВСЕ ФУНКЦИИ ИЗ ТГ-БОТА) -->
     <!-- ======================================================================= -->
     <div id="tab-service" class="tab-content space-y-3">
 
-      <!-- Screws Tilt Calculate 4-Wheel Dial Card -->
+      <!-- 1. Питание 220V & Klipper -->
+      <div class="bento-card p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-black uppercase text-white flex items-center gap-1.5">
+            <span>⚡ Питание & Klipper</span>
+          </h3>
+          <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">24V / 220V</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="executeSafePowerOff()" class="btn-tactile py-2.5 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5">
+            <span>🛡️ С остыванием</span>
+          </button>
+          <button onclick="openPowerModal()" class="btn-tactile py-2.5 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 font-bold text-xs flex items-center justify-center gap-1.5">
+            <span>🔌 Розетка 220V</span>
+          </button>
+          <button onclick="firmwareRestart()" class="btn-tactile py-2 px-3 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5">
+            <span>🔄 Klipper Рестарт</span>
+          </button>
+          <button onclick="restartMoonraker()" class="btn-tactile py-2 px-3 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5">
+            <span>🔄 Moonraker</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Нить & Экструдер (Sprite Extruder) -->
+      <div class="bento-card p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-black uppercase text-white flex items-center gap-1.5">
+            <span>🧵 Нить & Экструдер</span>
+          </h3>
+          <span class="text-[9px] font-mono text-slate-400">Sprite Direct</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="loadFilament()" class="btn-tactile py-2.5 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2">
+            <span>🧵 Загрузка нити</span>
+          </button>
+          <button onclick="unloadFilament()" class="btn-tactile py-2.5 px-3 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-rose-300 font-bold text-xs flex items-center justify-center gap-2">
+            <span>✂️ Выгрузка нити</span>
+          </button>
+          <button onclick="prepareBed()" class="btn-tactile py-2 px-3 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs flex items-center justify-center gap-2">
+            <span>🧽 Очистить сопло</span>
+          </button>
+          <button onclick="extrudeFilament(10)" class="btn-tactile py-2 px-3 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-amber-300 font-bold text-xs flex items-center justify-center gap-2">
+            <span>⬇️ Подать 10мм</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Вентиляторы & Тест обдува (5015) -->
+      <div class="bento-card p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-black uppercase text-white flex items-center gap-1.5">
+            <span>💨 Тест обдува (5015)</span>
+          </h3>
+          <span class="text-[10px] font-mono text-cyan-400">M106</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="setFanSpeed(0)" class="btn-tactile py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs">
+            0% (Стоп)
+          </button>
+          <button onclick="setFanSpeed(50)" class="btn-tactile py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/30 text-cyan-300 font-bold text-xs">
+            50% (Тихий)
+          </button>
+          <button onclick="setFanSpeed(100)" class="btn-tactile py-2 rounded-xl bg-cyan-500/30 hover:bg-cyan-500/40 border border-cyan-400/50 text-cyan-200 font-black text-xs shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+            100% (Турбо)
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. Умная подсветка 24V -->
+      <div class="bento-card p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-black uppercase text-white flex items-center gap-1.5">
+            <span>💡 Подсветка 24V</span>
+          </h3>
+          <span class="text-[9px] font-mono text-slate-400">Yandex IoT</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="toggleLightChannel('model')" class="btn-tactile py-2.5 px-3 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs flex items-center justify-center gap-2">
+            <span>💡 Сопло: ВКЛ/ВЫКЛ</span>
+          </button>
+          <button onclick="toggleLightChannel('bed')" class="btn-tactile py-2.5 px-3 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs flex items-center justify-center gap-2">
+            <span>💡 Стол: ВКЛ/ВЫКЛ</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 5. Спасение печати (Resurrect) -->
+      <div class="bento-card p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-black uppercase text-white flex items-center gap-1.5">
+            <span>🩹 Спасение печати</span>
+          </h3>
+          <span class="text-[9px] font-mono text-emerald-400 font-bold">Auto-Checkpoint</span>
+        </div>
+        <p class="text-[11px] text-slate-400">Продолжение печати после аварийной остановки или сбоя питания.</p>
+        <button onclick="triggerResurrect()" class="btn-tactile w-full py-2.5 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/40 text-violet-300 font-bold text-xs flex items-center justify-center gap-2">
+          <span>🚀 Спасти и продолжить с высоты Z</span>
+        </button>
+      </div>
+
+      <!-- 6. Screws Tilt Calculate 4-Wheel Dial Card -->
       <div class="bento-card p-4 space-y-3">
         <div class="flex items-center justify-between">
           <div>
@@ -407,8 +518,7 @@
 
         <!-- 4 Dial Quadrants reflecting the physical Ender-3 S1 Plus Bed -->
         <div class="screws-grid pt-1">
-
-          <!-- Rear-Left (RL) -->
+          <!-- RL -->
           <div class="screw-dial-item dial-ok" id="screwRL_card">
             <span class="text-[10px] font-bold text-slate-300">Задний Левый (RL)</span>
             <div class="screw-dial-wheel dial-ok-border" id="screwRL_wheel">
@@ -418,7 +528,7 @@
             <span class="text-[10px] font-mono font-bold text-emerald-400" id="screwRL_val">00:00 (База)</span>
           </div>
 
-          <!-- Rear-Right (RR) -->
+          <!-- RR -->
           <div class="screw-dial-item dial-cw" id="screwRR_card">
             <span class="text-[10px] font-bold text-slate-300">Задний Правый (RR)</span>
             <div class="screw-dial-wheel dial-cw-border" id="screwRR_wheel">
@@ -428,7 +538,7 @@
             <span class="text-[10px] font-mono font-bold text-cyan-400" id="screwRR_val">CW 01:15</span>
           </div>
 
-          <!-- Front-Left (FL) -->
+          <!-- FL -->
           <div class="screw-dial-item dial-ok" id="screwFL_card">
             <span class="text-[10px] font-bold text-slate-300">Передний Левый (FL)</span>
             <div class="screw-dial-wheel dial-ok-border" id="screwFL_wheel">
@@ -438,7 +548,7 @@
             <span class="text-[10px] font-mono font-bold text-emerald-400" id="screwFL_val">00:02 ✅</span>
           </div>
 
-          <!-- Front-Right (FR) -->
+          <!-- FR -->
           <div class="screw-dial-item dial-ccw" id="screwFR_card">
             <span class="text-[10px] font-bold text-slate-300">Передний Правый (FR)</span>
             <div class="screw-dial-wheel dial-ccw-border" id="screwFR_wheel">
@@ -447,15 +557,13 @@
             </div>
             <span class="text-[10px] font-mono font-bold text-amber-400" id="screwFR_val">CCW 00:45</span>
           </div>
-
         </div>
       </div>
 
-      <!-- Manual Motion & Axes Jogger -->
+      <!-- 7. Ручное перемещение осей (XY / Z) -->
       <div class="bento-card p-4 space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-black uppercase text-white">Ручное перемещение</h3>
-          <!-- Step Size Selector -->
           <div class="flex items-center gap-1 bg-black/60 p-1 rounded-xl border border-white/5">
             <button onclick="setJogStep(0.1)" class="jog-step-btn px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold text-slate-400">0.1</button>
             <button onclick="setJogStep(1)" class="jog-step-btn px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold text-slate-400">1</button>
@@ -464,9 +572,7 @@
           </div>
         </div>
 
-        <!-- Jog Directional Cross & Z-Axis -->
         <div class="grid grid-cols-3 gap-2 items-center">
-          <!-- XY Cross Pad -->
           <div class="col-span-2 grid grid-cols-3 gap-1.5 p-2 bg-black/40 rounded-2xl border border-white/5">
             <div></div>
             <button onclick="jogMove('Y', 1)" class="btn-tactile p-2 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs" style="min-height:38px;">Y+</button>
@@ -478,8 +584,6 @@
             <button onclick="jogMove('Y', -1)" class="btn-tactile p-2 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs" style="min-height:38px;">Y-</button>
             <div></div>
           </div>
-
-          <!-- Z Axis & Extruder Pad -->
           <div class="flex flex-col gap-1.5">
             <button onclick="jogMove('Z', 1)" class="btn-tactile p-2 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-cyan-400 font-bold text-xs" style="min-height:38px;">Z +</button>
             <button onclick="homeAxes('Z')" class="btn-tactile p-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/30 text-cyan-300 font-bold text-[10px]" style="min-height:32px;">Home Z</button>
@@ -487,28 +591,36 @@
           </div>
         </div>
 
-        <!-- Extruder Extrude / Retract Bar -->
         <div class="grid grid-cols-2 gap-2 pt-1 border-t border-white/[0.06]">
-          <button onclick="extrudeFilament(5)" class="btn-tactile py-2 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5" style="min-height:38px;">
-            <span>⬇️ Выдавить 5мм</span>
+          <button onclick="homeAxes('ALL')" class="btn-tactile py-2 px-3 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs flex items-center justify-center gap-2">
+            <span>🏠 Home All (G28)</span>
           </button>
-          <button onclick="extrudeFilament(-5)" class="btn-tactile py-2 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-300 font-bold text-xs flex items-center justify-center gap-1.5" style="min-height:38px;">
-            <span>⬆️ Откат 5мм</span>
+          <button onclick="runBedMeshCalibrate()" class="btn-tactile py-2 px-3 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs flex items-center justify-center gap-2">
+            <span>🌐 Сетка стола</span>
           </button>
         </div>
       </div>
 
-      <!-- Leveling & Homing Utilities -->
-      <div class="grid grid-cols-2 gap-2">
-        <button onclick="homeAxes('ALL')" class="btn-tactile py-2.5 px-3 rounded-2xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs flex items-center justify-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          <span>Home All (G28)</span>
-        </button>
-        <button onclick="runBedMeshCalibrate()" class="btn-tactile py-2.5 px-3 rounded-2xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs flex items-center justify-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-          <span>Сетка стола</span>
-        </button>
+      <!-- 8. Музыкальные сигналы (Buzzer) -->
+      <div class="bento-card p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-black uppercase text-white flex items-center gap-1.5">
+            <span>🎵 Музыкальный зуммер</span>
+          </h3>
+          <span class="text-[9px] font-mono text-slate-400">M300</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="playSong('star_wars')" class="btn-tactile py-2 px-3 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs flex items-center justify-center gap-2">
+            <span>🎺 Imperial March</span>
+          </button>
+          <button onclick="playSong('mario')" class="btn-tactile py-2 px-3 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs flex items-center justify-center gap-2">
+            <span>🍄 Super Mario</span>
+          </button>
+        </div>
       </div>
+
+      <!-- Breathing spacer for fixed bottom nav -->
+      <div class="h-28 shrink-0 w-full" aria-hidden="true"></div>
 
     </div>
 
@@ -551,6 +663,9 @@
           <span>Загрузка каталога G-кодов...</span>
         </div>
       </div>
+
+      <!-- Breathing spacer for fixed bottom nav -->
+      <div class="h-28 shrink-0 w-full" aria-hidden="true"></div>
 
     </div>
 
