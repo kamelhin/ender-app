@@ -77,6 +77,11 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="iconNozzleLight"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
       </button>
 
+      <!-- Day / Night Theme Toggle -->
+      <button id="btnThemeToggle" onclick="toggleTheme()" title="Переключить тему (День / Ночь)" class="p-2 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-300 btn-tactile" style="min-height:36px; min-width:36px;">
+        <span id="themeIcon" class="text-sm">☀️</span>
+      </button>
+
       <!-- Quick Telemetry Reload -->
       <button id="btnRefreshTelemetry" onclick="manualRefreshTelemetry()" title="Обновить статус" class="p-2 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-300 btn-tactile" style="min-height:36px; min-width:36px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="refreshIcon"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
@@ -93,6 +98,22 @@
     <!-- TAB 1: ПУЛЬТ (COCKPIT / DASHBOARD) -->
     <!-- ======================================================================= -->
     <div id="tab-dashboard" class="tab-content active space-y-3">
+
+      <!-- Printer Power On Banner (Dedicated 220V / 24V Switch) -->
+      <div id="powerOnBanner" class="bento-card p-3 bg-gradient-to-r from-emerald-500/10 via-surface to-surface border border-emerald-500/30 flex items-center justify-between gap-3 shadow-lg">
+        <div class="flex items-center gap-2.5 truncate">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+          </div>
+          <div class="truncate">
+            <span class="text-[11px] font-bold text-white block">Питание принтера (220V)</span>
+            <span class="text-[9px] text-slate-400 block" id="plugStatusSub">Яндекс Розетка 220V / Klipper</span>
+          </div>
+        </div>
+        <button onclick="powerOnPrinter()" class="btn-tactile px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs shadow-[0_0_15px_rgba(16,185,129,0.35)] shrink-0 flex items-center gap-1.5" style="min-height:36px;">
+          <span>⏻ ВКЛЮЧИТЬ</span>
+        </button>
+      </div>
 
       <!-- Hero Live Print Status Bento Card -->
       <div class="bento-card bento-card-gradient p-4 shadow-xl">
@@ -408,6 +429,9 @@
           <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">24V / 220V</span>
         </div>
         <div class="grid grid-cols-2 gap-2">
+          <button onclick="powerOnPrinter()" class="btn-tactile py-2.5 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center justify-center gap-1.5">
+            <span>⏻ Включить 220V</span>
+          </button>
           <button onclick="executeSafePowerOff()" class="btn-tactile py-2.5 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5">
             <span>🛡️ С остыванием</span>
           </button>
@@ -416,9 +440,6 @@
           </button>
           <button onclick="firmwareRestart()" class="btn-tactile py-2 px-3 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5">
             <span>🔄 Klipper Рестарт</span>
-          </button>
-          <button onclick="restartMoonraker()" class="btn-tactile py-2 px-3 rounded-xl bg-surface hover:bg-surfaceHover border border-surfaceBorder text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5">
-            <span>🔄 Moonraker</span>
           </button>
         </div>
       </div>
@@ -772,11 +793,14 @@
       </div>
       <p class="text-xs text-slate-300 mb-5">Безопасное выключение охлаждает хотенд ниже 50°C перед отключением умной розетки TP-Link/Tasmota.</p>
       <div class="space-y-2">
-        <button onclick="executeSafePowerOff()" class="btn-tactile w-full py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-400 font-bold text-xs flex items-center justify-center gap-2">
+        <button onclick="powerOnPrinter(); closePowerModal();" class="btn-tactile w-full py-2.5 rounded-xl bg-emerald-500/25 hover:bg-emerald-500/35 border border-emerald-500/50 text-emerald-300 font-black text-xs flex items-center justify-center gap-2">
+          <span>⏻ Включить питание розетки (220V)</span>
+        </button>
+        <button onclick="executeSafePowerOff()" class="btn-tactile w-full py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-bold text-xs flex items-center justify-center gap-2">
           <span>🛡️ Безопасное выключение (с охлаждением)</span>
         </button>
         <button onclick="executeForcePowerOff()" class="btn-tactile w-full py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 font-medium text-xs flex items-center justify-center gap-2">
-          <span>⚡ Принудительно выключить питание</span>
+          <span>⚡ Принудительно обесточить розетку</span>
         </button>
         <button onclick="closePowerModal()" class="btn-tactile w-full py-2 rounded-xl bg-slate-800 text-slate-400 text-xs">
           Отмена
