@@ -669,3 +669,170 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.22);
 }
+
+/* ==========================================================================
+   DAY / LIGHT THEME (PEARL LIGHT / SNOW LUXURY)
+   ========================================================================== */
+
+html.light, body.light {
+  --bg-obsidian: #F1F5F9;
+  --surface-base: #FFFFFF;
+  --surface-card: #F8FAFC;
+  --surface-card-hover: #E2E8F0;
+  --surface-inner: #F1F5F9;
+  
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-light: rgba(0, 0, 0, 0.14);
+  --border-active: rgba(16, 185, 129, 0.6);
+  
+  --accent-emerald: #059669;
+  --accent-cyan: #0891B2;
+  --accent-amber: #D97706;
+  --accent-danger: #DC2626;
+  --accent-violet: #7C3AED;
+  
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+  color-scheme: light;
+}
+
+html.light {
+  background-color: #F1F5F9 !important;
+}
+
+body.light {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+.light header {
+  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.light h1, .light h2, .light h3, .light h4, .light .text-white {
+  color: #0F172A !important;
+}
+
+.light .text-slate-200, .light .text-slate-300 {
+  color: #1E293B !important;
+}
+
+.light .text-slate-400 {
+  color: #64748B !important;
+}
+
+.light .text-slate-500 {
+  color: #94A3B8 !important;
+}
+
+.light .bento-card {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+.light .bento-card-gradient {
+  background: linear-gradient(145deg, #FFFFFF 0%, #F8FAFC 100%) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.06) !important;
+}
+
+.light .bg-surface {
+  background-color: #FFFFFF !important;
+}
+
+.light .bg-surfaceCard {
+  background-color: #F8FAFC !important;
+}
+
+.light .bg-surfaceHover:hover {
+  background-color: #F1F5F9 !important;
+}
+
+.light .border-surfaceBorder {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.light .border-white\/10, 
+.light .border-white\/5, 
+.light .border-white\/\[0\.08\], 
+.light .border-white\/\[0\.06\] {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.light .bg-black\/40, 
+.light .bg-black\/60, 
+.light .bg-black\/75, 
+.light .bg-black\/80 {
+  background-color: #F1F5F9 !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+.light .bg-white\/5 {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.light .floating-nav-bar {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1px solid rgba(0, 0, 0, 0.09) !important;
+  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(16, 185, 129, 0.05) !important;
+}
+
+.light .nav-tab-item {
+  color: #64748B !important;
+}
+
+.light .nav-tab-item.active {
+  color: #059669 !important;
+  background: rgba(16, 185, 129, 0.12) !important;
+}
+
+.light .nav-tab-item.active::after {
+  background: #059669 !important;
+  box-shadow: 0 0 8px #059669 !important;
+}
+
+.light .sheet-backdrop {
+  background: rgba(15, 23, 42, 0.45) !important;
+}
+
+.light .sheet-content {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.18), 0 0 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+.light .sheet-handle {
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+.light .viewport-container {
+  background: #E2E8F0 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.light .screw-dial-wheel {
+  background: #FFFFFF !important;
+}
+
+.light .dropzone-box {
+  background: #FFFFFF !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+.light .bg-slate-800 {
+  background-color: #E2E8F0 !important;
+  color: #334155 !important;
+}
+
+.light .bg-slate-800:hover {
+  background-color: #CBD5E1 !important;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
