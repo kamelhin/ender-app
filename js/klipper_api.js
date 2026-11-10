@@ -958,6 +958,34 @@
       }
       return this.sendGcode('TOGGLE_LIGHTS');
     }
+
+    async powerOn() {
+      if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.sendData === 'function') {
+        try {
+          window.Telegram.WebApp.sendData(JSON.stringify({ cmd: 'POWER_SOCKET_ON' }));
+        } catch (e) {}
+      }
+      this._sendNtfyRelay('POWER_SOCKET_ON');
+      try {
+        await fetch(`${this.host}/machine/device_power/device?device=printer&action=on`, { method: 'POST' });
+      } catch (e) {}
+      try {
+        await this.sendGcode('POWER_SOCKET_ON');
+      } catch (e) {}
+    }
+
+    async powerOff(safe = true) {
+      const cmd = safe ? 'SAFE_POWER_OFF' : 'POWER_SOCKET_OFF';
+      if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.sendData === 'function') {
+        try {
+          window.Telegram.WebApp.sendData(JSON.stringify({ cmd }));
+        } catch (e) {}
+      }
+      this._sendNtfyRelay(cmd);
+      try {
+        await this.sendGcode(cmd);
+      } catch (e) {}
+    }
   }
 
   return KlipperAPI;
