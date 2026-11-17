@@ -25,7 +25,7 @@
 }(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  const DEFAULT_HOST = 'http://192.168.1.21:7125';
+  const DEFAULT_HOST = 'http://192.168.1.114:7125';
   const NTFY_CMD_TOPIC = 'myender_kamelhin_cmd_82737';
   const NTFY_TELEMETRY_TOPIC = 'myender_kamelhin_telemetry_82737';
 
