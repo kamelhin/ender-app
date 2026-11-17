@@ -51,7 +51,7 @@
       <div>
         <h1 class="text-sm font-black tracking-tight flex items-center gap-1.5" style="color: var(--text-primary);">
           Ender-3 S1 Plus
-          <span class="text-[9px] uppercase font-mono font-bold px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-500 dark:text-emerald-400 border border-emerald-500/30">Klipper</span>
+          <span class="text-[9px] uppercase font-mono font-bold px-1.5 py-0.5 rounded-md" style="background-color: var(--surface-inner); color: var(--accent-creality); border: 1px solid var(--border-card);">Klipper</span>
         </h1>
         <p class="text-[11px] font-medium truncate max-w-[170px]" style="color: var(--text-secondary);" id="statusSub">Готов к печати</p>
       </div>
@@ -117,7 +117,7 @@
             </div>
             <div>
               <span class="text-[9px] uppercase font-bold tracking-wider block" style="color: var(--text-muted);">ШИМ</span>
-              <span class="text-[11px] font-bold font-mono text-emerald-500" id="dialPwmPct">0%</span>
+              <span class="text-[11px] font-bold font-mono" style="color: var(--accent-creality);" id="dialPwmPct">0%</span>
             </div>
           </div>
 
@@ -128,7 +128,7 @@
               <circle class="dial-svg-bg-track" cx="95" cy="95" r="82"></circle>
               <!-- Colored Progress Arc (circumference = 2 * PI * 82 = 515.22) -->
               <circle id="dialProgressArc" class="dial-svg-progress" cx="95" cy="95" r="82"
-                      stroke="#FF6B35" stroke-dasharray="515.22" stroke-dashoffset="515.22"></circle>
+                      stroke="var(--accent-hotend)" stroke-dasharray="515.22" stroke-dashoffset="515.22"></circle>
             </svg>
 
             <!-- Tactile Central Knob -->
@@ -169,19 +169,19 @@
           <div class="grid grid-cols-4 gap-1.5">
             <button onclick="applyPreheatPreset('PLA')" class="btn-tactile py-1.5 rounded-xl text-xs font-bold flex flex-col items-center" style="background-color: var(--surface-card-subtle); border: 1px solid var(--border-card); color: var(--accent-creality);">
               <span>PLA</span>
-              <span class="text-[9px] font-normal opacity-80">205°/60°</span>
+              <span class="text-[9px] font-semibold opacity-90">205°/60°</span>
             </button>
             <button onclick="applyPreheatPreset('PETG')" class="btn-tactile py-1.5 rounded-xl text-xs font-bold flex flex-col items-center" style="background-color: var(--surface-card-subtle); border: 1px solid var(--border-card); color: var(--accent-hotend);">
               <span>PETG</span>
-              <span class="text-[9px] font-normal opacity-80">235°/78°</span>
+              <span class="text-[9px] font-semibold opacity-90">235°/78°</span>
             </button>
             <button onclick="applyPreheatPreset('ABS')" class="btn-tactile py-1.5 rounded-xl text-xs font-bold flex flex-col items-center" style="background-color: var(--surface-card-subtle); border: 1px solid var(--border-card); color: var(--accent-bed);">
               <span>ABS</span>
-              <span class="text-[9px] font-normal opacity-80">245°/100°</span>
+              <span class="text-[9px] font-semibold opacity-90">245°/100°</span>
             </button>
             <button onclick="applyPreheatPreset('COOLDOWN')" class="btn-tactile py-1.5 rounded-xl text-xs font-bold flex flex-col items-center" style="background-color: var(--surface-card-subtle); border: 1px solid var(--border-card); color: var(--text-secondary);">
               <span>❄️ Стоп</span>
-              <span class="text-[9px] font-normal opacity-80">0°/0°</span>
+              <span class="text-[9px] font-semibold opacity-90">0°/0°</span>
             </button>
           </div>
         </div>
@@ -189,17 +189,17 @@
       </div>
 
       <!-- ===================================================================== -->
-      <!-- BENTO SMART PERIPHERALS GRID (220V MATTER PLUG, FAN, SPEED) -->
+      <!-- BENTO SMART PERIPHERALS GRID (220V TUYA SMART PLUG, FAN, SPEED) -->
       <!-- ===================================================================== -->
       <div class="grid grid-cols-2 gap-2.5">
 
-        <!-- Card 1 (Full Width): ⚡ Розетка 220V (Matter Smart Plug) -->
+        <!-- Card 1 (Full Width): ⚡ Розетка 220V (Tuya Smart Plug) -->
         <div class="col-span-2 bento-card p-3.5 flex flex-col justify-between">
           <div class="flex items-center justify-between mb-2">
             <div class="flex items-center gap-2">
-              <span class="text-xl text-amber-500 shrink-0">⚡</span>
+              <span class="text-xl shrink-0" style="color: var(--accent-bed);">⚡</span>
               <div>
-                <h3 class="text-xs font-bold leading-tight" style="color: var(--text-primary);">Электросеть 220V (Matter)</h3>
+                <h3 class="text-xs font-bold leading-tight" style="color: var(--text-primary);">Электросеть 220V (Tuya Plug)</h3>
                 <span class="text-[10px]" style="color: var(--text-muted);" id="plugStateText">Умная розетка ВКЛ</span>
               </div>
             </div>
@@ -213,15 +213,15 @@
           <div class="p-2 rounded-xl grid grid-cols-3 gap-2 text-center text-xs font-mono tabular-nums" style="background-color: var(--surface-inner); border: 1px solid var(--border-subtle);">
             <div>
               <span class="text-[9px] uppercase font-bold tracking-wider block" style="color: var(--text-muted);">Напряжение</span>
-              <b style="color: var(--text-primary);" id="plugVoltage">234.8 V</b>
+              <b style="color: var(--text-primary);" id="plugVoltage">230.0 V</b>
             </div>
             <div>
               <span class="text-[9px] uppercase font-bold tracking-wider block" style="color: var(--text-muted);">Мощность</span>
-              <b class="text-emerald-500 dark:text-emerald-400" id="plugPower">6.2 W</b>
+              <b style="color: var(--accent-creality);" id="plugPower">-- W</b>
             </div>
             <div>
               <span class="text-[9px] uppercase font-bold tracking-wider block" style="color: var(--text-muted);">Ток</span>
-              <b style="color: var(--text-primary);" id="plugAmps">0.05 A</b>
+              <b style="color: var(--text-primary);" id="plugAmps">-- A</b>
             </div>
           </div>
         </div>
@@ -249,10 +249,10 @@
         <div class="bento-card p-3 flex flex-col justify-between">
           <div class="flex items-center justify-between mb-1.5">
             <div class="flex items-center gap-1.5">
-              <span class="text-base text-violet-400">🚀</span>
+              <span class="text-base" style="color: var(--accent-speed);">🚀</span>
               <div>
                 <h3 class="text-xs font-bold leading-tight" style="color: var(--text-primary);">Скорость M220</h3>
-                <span class="text-[10px] font-mono font-bold text-violet-400" id="speedFactorVal">100%</span>
+                <span class="text-[10px] font-mono font-bold" style="color: var(--accent-speed);" id="speedFactorVal">100%</span>
               </div>
             </div>
           </div>
@@ -275,7 +275,7 @@
             <span class="text-xs font-bold" style="color: var(--text-primary);" id="printStatusTitle">Режим ожидания</span>
             <span class="text-[10px] truncate" style="color: var(--text-muted);" id="currentFileName">Файл не выбран</span>
           </div>
-          <span class="text-sm font-black font-mono tabular-nums text-emerald-500 dark:text-emerald-400" id="printPercent">0%</span>
+          <span class="text-sm font-black font-mono tabular-nums" style="color: var(--accent-creality);" id="printPercent">0%</span>
         </div>
 
         <!-- Progress Bar -->

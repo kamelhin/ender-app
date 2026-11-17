@@ -84,6 +84,11 @@
 
       // Optional SSE stream for remote cloud relay
       this.sseSource = null;
+
+      // Auto-initialize immediately
+      if (options.autoInit !== false) {
+        setTimeout(() => this.init(), 10);
+      }
     }
 
     // =========================================================================
@@ -477,9 +482,29 @@
     }
 
     // =========================================================================
-    // REMOTE NTFY RELAY INTEGRATION (Optional fallback)
+    // REMOTE NTFY RELAY INTEGRATION (Zero-Latency Dual HTTP / SSE Sync)
     // =========================================================================
     initNtfyStream() {
+      // 1. Immediate initial snapshot poll
+      fetch(`https://ntfy.sh/${NTFY_TELEMETRY_TOPIC}/json?poll=1`)
+        .then(r => r.text())
+        .then(text => {
+          if (!text) return;
+          const lines = text.trim().split('\n');
+          for (let i = lines.length - 1; i >= 0; i--) {
+            try {
+              const raw = JSON.parse(lines[i]);
+              const msg = raw.message ? (typeof raw.message === 'string' ? JSON.parse(raw.message) : raw.message) : raw;
+              if (msg && (msg.hotend !== undefined || msg.state !== undefined)) {
+                this._applyTelemetryPacket(msg);
+                break;
+              }
+            } catch (e) {}
+          }
+        })
+        .catch(() => {});
+
+      // 2. Open persistent EventSource SSE stream
       if (typeof EventSource === 'undefined') return;
       try {
         if (this.sseSource) this.sseSource.close();
@@ -488,25 +513,44 @@
         this.sseSource.onmessage = (e) => {
           try {
             const raw = JSON.parse(e.data);
-            const msg = raw.message ? JSON.parse(raw.message) : raw;
+            const msg = raw.message ? (typeof raw.message === 'string' ? JSON.parse(raw.message) : raw.message) : raw;
             if (msg) {
-              // Map ntfy structure into state
-              if (msg.hotend !== undefined) this.state.hotend = parseFloat(msg.hotend);
-              if (msg.hotend_target !== undefined) this.state.hotend_target = Math.round(msg.hotend_target);
-              if (msg.bed !== undefined) this.state.bed = parseFloat(msg.bed);
-              if (msg.bed_target !== undefined) this.state.bed_target = Math.round(msg.bed_target);
-              if (msg.progress !== undefined) this.state.progress = parseInt(msg.progress);
-              if (msg.filename) this.state.filename = msg.filename;
-              if (msg.state) this.state.status = msg.state.toLowerCase();
-              if (msg.z !== undefined) this.state.z = parseFloat(msg.z);
-              if (msg.plug) this.state.plug = msg.plug;
-              if (msg.climate) this.state.climate = msg.climate;
-              if (msg.lights) this.state.lights = msg.lights;
-              this._emit('telemetry', Object.assign({}, this.state));
+              this._applyTelemetryPacket(msg);
             }
-          } catch (err) {}
+          } catch (err) {
+            console.warn('[KlipperAPI] ntfy SSE parse error:', err);
+          }
         };
-      } catch (err) {}
+
+        this.sseSource.onerror = () => {
+          if (this.sseSource && this.sseSource.readyState === EventSource.CLOSED) {
+            setTimeout(() => this.initNtfyStream(), 3000);
+          }
+        };
+      } catch (err) {
+        console.warn('[KlipperAPI] ntfy SSE init error:', err);
+      }
+    }
+
+    _applyTelemetryPacket(msg) {
+      if (msg.hotend !== undefined) this.state.hotend = parseFloat(msg.hotend);
+      if (msg.hotend_target !== undefined) this.state.hotend_target = Math.round(msg.hotend_target);
+      if (msg.bed !== undefined) this.state.bed = parseFloat(msg.bed);
+      if (msg.bed_target !== undefined) this.state.bed_target = Math.round(msg.bed_target);
+      if (msg.fan !== undefined) this.state.fan_speed = parseInt(msg.fan, 10);
+      else if (msg.fan_speed !== undefined) this.state.fan_speed = parseInt(msg.fan_speed, 10);
+      if (msg.speed !== undefined) this.state.speed_factor = parseInt(msg.speed, 10);
+      else if (msg.speed_factor !== undefined) this.state.speed_factor = parseInt(msg.speed_factor, 10);
+      if (msg.progress !== undefined) this.state.progress = Math.round(parseFloat(msg.progress));
+      if (msg.filename) this.state.filename = msg.filename;
+      if (msg.status) this.state.status = msg.status.toLowerCase();
+      if (msg.state) this.state.status = msg.state.toLowerCase();
+      if (msg.z !== undefined) this.state.z = parseFloat(msg.z);
+      if (msg.plug) this.state.plug = msg.plug;
+      if (msg.climate) this.state.climate = msg.climate;
+      if (msg.lights) this.state.lights = msg.lights;
+      this.lastTelemetryTs = Date.now();
+      this._emit('telemetry', Object.assign({}, this.state));
     }
 
     async _sendNtfyRelay(cmd, params = {}) {

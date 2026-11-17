@@ -127,6 +127,7 @@
 
     localStorage.setItem('ender_theme', themeName);
     syncTelegramThemeColors();
+    renderDial();
   }
 
   function syncTelegramThemeColors() {
@@ -168,7 +169,7 @@
         btnBed.style.color = 'var(--text-muted)';
         btnBed.style.boxShadow = 'none';
       }
-      if (progressArc) progressArc.setAttribute('stroke', '#FF6B35');
+      if (progressArc) progressArc.setAttribute('stroke', 'var(--accent-hotend)');
     } else {
       if (btnBed) {
         btnBed.style.backgroundColor = 'var(--surface-card)';
@@ -180,7 +181,7 @@
         btnHotend.style.color = 'var(--text-muted)';
         btnHotend.style.boxShadow = 'none';
       }
-      if (progressArc) progressArc.setAttribute('stroke', '#FFB020');
+      if (progressArc) progressArc.setAttribute('stroke', 'var(--accent-bed)');
     }
 
     renderDial();
@@ -371,8 +372,11 @@
     haptic('warning');
     state.isPlugOn = isChecked;
     const txt = document.getElementById('plugStateText');
-    if (txt) txt.textContent = isChecked ? 'Matter ВКЛ' : 'Matter ВЫКЛ';
+    if (txt) txt.textContent = isChecked ? 'Tuya ВКЛ' : 'Tuya ВЫКЛ';
 
+    if (window.klipperApi && typeof window.klipperApi._sendNtfyRelay === 'function') {
+      window.klipperApi._sendNtfyRelay(isChecked ? 'PLUG_ON' : 'PLUG_OFF');
+    }
     showToast(isChecked ? 'Розетка 220V: Питание подано' : 'Розетка 220V: Питание отключено', '⚡');
   };
 
@@ -575,57 +579,85 @@
         if (data.bed_target !== undefined) state.bedTarget = data.bed_target;
         if (data.fan_speed !== undefined) state.fanSpeedPct = data.fan_speed;
         if (data.speed_factor !== undefined) state.speedFactor = data.speed_factor;
+        if (data.progress !== undefined) state.printPercent = data.progress;
+        if (data.filename !== undefined) state.currentFile = data.filename || 'Файл не выбран';
+        if (data.status !== undefined) state.printStatus = data.status;
         if (data.plug) {
-          if (data.plug.voltage) state.plugVoltage = data.plug.voltage;
-          if (data.plug.power) state.plugPower = data.plug.power;
+          if (data.plug.voltage !== undefined && data.plug.voltage !== null) state.plugVoltage = parseFloat(data.plug.voltage);
+          if (data.plug.power !== undefined && data.plug.power !== null) state.plugPower = parseFloat(data.plug.power);
+          if (data.plug.amperage !== undefined && data.plug.amperage !== null) state.plugAmps = parseFloat(data.plug.amperage);
+          if (data.plug.is_on !== undefined && data.plug.is_on !== null) state.isPlugOn = Boolean(data.plug.is_on);
         }
         renderDial();
         updateTelemetryUI();
       });
     }
 
-    // Live update loop for telemetry strip & timestamp
+    // Live update loop for timestamps
     setInterval(() => {
-      const vJitter = (Math.random() * 0.4 - 0.2).toFixed(1);
-      const wJitter = (Math.random() * 0.2 - 0.1).toFixed(1);
-      
-      const vEl = document.getElementById('plugVoltage');
-      const pEl = document.getElementById('plugPower');
-      const aEl = document.getElementById('plugAmps');
-      if (vEl) vEl.textContent = `${(234.8 + parseFloat(vJitter)).toFixed(1)} V`;
-      if (pEl) pEl.textContent = `${(6.2 + parseFloat(wJitter)).toFixed(1)} W`;
-      if (aEl) aEl.textContent = '0.05 A';
-
-      // Sim heating smoothly if target set
-      if (state.hotendTarget > state.hotendTemp) {
-        state.hotendTemp = Math.min(state.hotendTarget, state.hotendTemp + 1.2);
-        renderDial();
-      } else if (state.hotendTarget === 0 && state.hotendTemp > 24) {
-        state.hotendTemp = Math.max(24, state.hotendTemp - 0.8);
-        renderDial();
-      }
-
-      if (state.bedTarget > state.bedTemp) {
-        state.bedTemp = Math.min(state.bedTarget, state.bedTemp + 0.5);
-        renderDial();
-      } else if (state.bedTarget === 0 && state.bedTemp > 22) {
-        state.bedTemp = Math.max(22, state.bedTemp - 0.4);
-        renderDial();
-      }
-
       const hudTs = document.getElementById('hudTimestamp');
       if (hudTs) {
         const now = new Date();
         hudTs.textContent = now.toTimeString().split(' ')[0];
       }
-    }, 1500);
+    }, 1000);
   }
 
   function updateTelemetryUI() {
+    // Temperatures
     const hudE = document.getElementById('hudExtruderTemp');
     const hudB = document.getElementById('hudBedTemp');
     if (hudE) hudE.textContent = `${Math.round(state.hotendTemp)}°C`;
     if (hudB) hudB.textContent = `${Math.round(state.bedTemp)}°C`;
+
+    // Smart Plug Telemetry
+    const vEl = document.getElementById('plugVoltage');
+    const pEl = document.getElementById('plugPower');
+    const aEl = document.getElementById('plugAmps');
+    const plugInput = document.getElementById('togglePlugInput');
+    const plugTxt = document.getElementById('plugStateText');
+
+    if (vEl) vEl.textContent = `${(state.plugVoltage || 230.0).toFixed(1)} V`;
+    if (pEl) pEl.textContent = `${(state.plugPower || 0.0).toFixed(1)} W`;
+    if (aEl) aEl.textContent = `${(state.plugAmps || 0.0).toFixed(2)} A`;
+    if (plugInput) plugInput.checked = state.isPlugOn;
+    if (plugTxt) plugTxt.textContent = state.isPlugOn ? 'Умная розетка ВКЛ' : 'Умная розетка ВЫКЛ';
+
+    // Fan and Speed
+    const fanTxt = document.getElementById('fanSpeedPct');
+    const fanIcon = document.getElementById('fanSpinIcon');
+    if (fanTxt) fanTxt.textContent = `${state.fanSpeedPct}%`;
+    if (fanIcon) {
+      if (state.fanSpeedPct > 0) {
+        fanIcon.style.display = 'inline-block';
+        fanIcon.style.animation = `spin ${Math.max(0.3, 1.5 - (state.fanSpeedPct / 100))}s linear infinite`;
+      } else {
+        fanIcon.style.animation = 'none';
+      }
+    }
+
+    const speedTxt = document.getElementById('speedFactorVal');
+    if (speedTxt) speedTxt.textContent = `${state.speedFactor}%`;
+
+    // Print Progress & File
+    const fileEl = document.getElementById('currentFileName');
+    const progressEl = document.getElementById('printPercent');
+    const progressBar = document.getElementById('mainProgressBar');
+    const statusTitleEl = document.getElementById('printStatusTitle');
+    const statusSubEl = document.getElementById('statusSub');
+
+    if (fileEl) fileEl.textContent = state.currentFile;
+    if (progressEl) progressEl.textContent = `${state.printPercent}%`;
+    if (progressBar) progressBar.style.width = `${Math.min(100, Math.max(0, state.printPercent))}%`;
+
+    let label = 'Режим ожидания';
+    if (state.printStatus === 'printing') label = 'Печать детали...';
+    else if (state.printStatus === 'paused') label = 'Печать на паузе';
+    else if (state.printStatus === 'error') label = 'Ошибка';
+    else if (state.printStatus === 'offline') label = 'Принтер обесточен';
+
+    if (statusTitleEl) statusTitleEl.textContent = label;
+    if (statusSubEl) statusSubEl.textContent = label;
   }
 
   // -------------------------------------------------------------------------
