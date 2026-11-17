@@ -29,20 +29,20 @@
   <!-- Huawei / Creality Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="p-3 max-w-[480px] mx-auto min-h-screen flex flex-col justify-between">
+<body class="p-3 max-w-[440px] mx-auto min-h-screen flex flex-col justify-between">
 
   <!-- ========================================================================= -->
   <!-- FLOATING TOAST NOTIFICATION -->
   <!-- ========================================================================= -->
   <div id="toastBox">
-    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><polyline points="20 6 9 17 4 12"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><polyline points="20 6 9 17 4 12"/></svg>
     <span id="toastMessage">Команда отправлена</span>
   </div>
 
   <!-- ========================================================================= -->
   <!-- TOP APP HEADER -->
   <!-- ========================================================================= -->
-  <header class="flex items-center justify-between pb-3 border-b border-black/10 dark:border-white/10 mb-3.5">
+  <header class="flex items-center justify-between pb-2.5 border-b border-black/10 dark:border-white/10 mb-3">
     <div class="flex items-center space-x-2.5">
       <div class="relative">
         <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-[0_0_12px_#00D2BE]" id="statusDot"></div>
@@ -83,15 +83,15 @@
     <!-- ======================================================================= -->
     <!-- TAB 1: ПУЛЬТ (COCKPIT / DASHBOARD) - VARIANT B -->
     <!-- ======================================================================= -->
-    <div id="tab-dashboard" class="tab-content active space-y-3.5">
+    <div id="tab-dashboard" class="tab-content active space-y-3">
 
       <!-- ===================================================================== -->
       <!-- HERO CARD: CIRCULAR THERMOSTAT DIAL (VARIANT B) -->
       <!-- ===================================================================== -->
-      <div class="bento-card p-4">
+      <div class="bento-card p-3.5">
         
         <!-- Heater Selector Tabs: Hotend vs Bed -->
-        <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-1.5 p-1 rounded-2xl" style="background-color: var(--surface-inner); border: 1px solid var(--border-subtle);">
             <button id="dialTabHotend" onclick="selectDialTarget('hotend')" class="px-3 py-1 rounded-xl text-xs font-bold transition-all duration-200" style="background-color: var(--surface-card); color: var(--accent-hotend); box-shadow: var(--card-shadow);">
               🔥 Сопло E3
@@ -108,22 +108,32 @@
           </div>
         </div>
 
-        <!-- Dial & Side Stepper Buttons -->
-        <div class="flex items-center justify-center gap-3 my-2">
+        <!-- Dial Row: Info on Left, Center Dial, Vertical Steppers on Right -->
+        <div class="flex items-center justify-between my-1 px-1">
           
-          <!-- Stepper Minus (-) -->
-          <button onclick="stepDialTemp(-5)" class="dial-stepper-btn btn-tactile" title="Уменьшить на 5°C">
-            <span>−</span>
-          </button>
+          <!-- Left Info Column -->
+          <div class="flex flex-col space-y-2 w-14">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-lg" style="background-color: var(--surface-inner); border: 1px solid var(--border-subtle);" id="dialLeftIcon">
+              ❄️
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold tracking-wider block" style="color: var(--text-muted);">Цель</span>
+              <span class="text-xs font-bold font-mono" style="color: var(--text-primary);" id="dialLeftTarget">0°C</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold tracking-wider block" style="color: var(--text-muted);">ШИМ</span>
+              <span class="text-[11px] font-bold font-mono text-emerald-500" id="dialPwmPct">0%</span>
+            </div>
+          </div>
 
           <!-- Circular Thermostat Dial Display -->
           <div class="dial-container">
-            <svg class="dial-svg-ring" viewBox="0 0 250 250">
+            <svg class="dial-svg-ring" viewBox="0 0 190 190">
               <!-- Background Outer Track -->
-              <circle class="dial-svg-bg-track" cx="125" cy="125" r="105"></circle>
-              <!-- Colored Progress Arc -->
-              <circle id="dialProgressArc" class="dial-svg-progress" cx="125" cy="125" r="105"
-                      stroke="#FF6B35" stroke-dasharray="660" stroke-dashoffset="660"></circle>
+              <circle class="dial-svg-bg-track" cx="95" cy="95" r="82"></circle>
+              <!-- Colored Progress Arc (circumference = 2 * PI * 82 = 515.22) -->
+              <circle id="dialProgressArc" class="dial-svg-progress" cx="95" cy="95" r="82"
+                      stroke="#FF6B35" stroke-dasharray="515.22" stroke-dashoffset="515.22"></circle>
             </svg>
 
             <!-- Tactile Central Knob -->
@@ -141,32 +151,40 @@
             </div>
           </div>
 
-          <!-- Stepper Plus (+) -->
-          <button onclick="stepDialTemp(+5)" class="dial-stepper-btn btn-tactile" title="Увеличить на 5°C">
-            <span>+</span>
-          </button>
+          <!-- Right Stepper Column (Matching User's Reference Screenshot) -->
+          <div class="dial-stepper-stack w-14">
+            <button onclick="stepDialTemp(+5)" class="dial-stepper-btn btn-tactile" title="Увеличить (+5°C)">
+              <span>+</span>
+            </button>
+            <button onclick="stepDialTemp(-5)" class="dial-stepper-btn btn-tactile" title="Уменьшить (-5°C)">
+              <span>−</span>
+            </button>
+            <button onclick="toggleHeaterPower()" class="dial-stepper-btn btn-tactile" title="Вкл / Выкл нагрев" id="btnDialPower">
+              <span class="text-sm">⚡</span>
+            </button>
+          </div>
         </div>
 
         <!-- Quick Material Preheat Pills -->
-        <div class="mt-4 pt-3 border-t" style="border-color: var(--border-subtle);">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[10px] uppercase font-bold tracking-wider" style="color: var(--text-muted);">Быстрый преднагрев</span>
-            <span class="text-[10px] font-mono" style="color: var(--text-secondary);" id="dialTargetDualStatus">E: 24°C • B: 22°C</span>
+        <div class="mt-2.5 pt-2 border-t" style="border-color: var(--border-subtle);">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[9px] uppercase font-bold tracking-wider" style="color: var(--text-muted);">Быстрый преднагрев</span>
+            <span class="text-[9px] font-mono" style="color: var(--text-secondary);" id="dialTargetDualStatus">E: 24°C • B: 22°C</span>
           </div>
           <div class="grid grid-cols-4 gap-1.5">
-            <button onclick="applyPreheatPreset('PLA')" class="btn-tactile py-2 rounded-xl text-xs font-bold flex flex-col items-center" style="background-color: var(--surface-card-subtle); border: 1px solid var(--border-card); color: var(--accent-creality);">
+            <button onclick="applyPreheatPreset('PLA')" class="btn-tactile py-1.5 rounded-xl text-xs font-bold flex flex-col items-center" style="background-color: var(--surface-card-subtle); border: 1px solid var(--border-card); color: var(--accent-creality);">
               <span>PLA</span>
               <span class="text-[9px] font-normal opacity-80">205°/60°</span>
             </button>
-            <button onclick="applyPreheatPreset('PETG')" class="btn-tactile py-2 rounded-xl text-xs font-bold flex flex-col items-center" style="background-color: var(--surface-card-subtle); border: 1px solid var(--border-card); color: var(--accent-hotend);">
+            <button onclick="applyPreheatPreset('PETG')" class="btn-tactile py-1.5 rounded-xl text-xs font-bold flex flex-col items-center" style="background-color: var(--surface-card-subtle); border: 1px solid var(--border-card); color: var(--accent-hotend);">
               <span>PETG</span>
               <span class="text-[9px] font-normal opacity-80">235°/78°</span>
             </button>
-            <button onclick="applyPreheatPreset('ABS')" class="btn-tactile py-2 rounded-xl text-xs font-bold flex flex-col items-center" style="background-color: var(--surface-card-subtle); border: 1px solid var(--border-card); color: var(--accent-bed);">
+            <button onclick="applyPreheatPreset('ABS')" class="btn-tactile py-1.5 rounded-xl text-xs font-bold flex flex-col items-center" style="background-color: var(--surface-card-subtle); border: 1px solid var(--border-card); color: var(--accent-bed);">
               <span>ABS</span>
               <span class="text-[9px] font-normal opacity-80">245°/100°</span>
             </button>
-            <button onclick="applyPreheatPreset('COOLDOWN')" class="btn-tactile py-2 rounded-xl text-xs font-bold flex flex-col items-center" style="background-color: var(--surface-card-subtle); border: 1px solid var(--border-card); color: var(--text-secondary);">
+            <button onclick="applyPreheatPreset('COOLDOWN')" class="btn-tactile py-1.5 rounded-xl text-xs font-bold flex flex-col items-center" style="background-color: var(--surface-card-subtle); border: 1px solid var(--border-card); color: var(--text-secondary);">
               <span>❄️ Стоп</span>
               <span class="text-[9px] font-normal opacity-80">0°/0°</span>
             </button>
@@ -181,13 +199,13 @@
       <div class="grid grid-cols-2 gap-2.5">
 
         <!-- Card 1: 💡 Подсветка 24V (Light Control) -->
-        <div class="bento-card p-3.5 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-1.5">
-              <span class="text-base">💡</span>
-              <div>
-                <h3 class="text-xs font-bold leading-tight" style="color: var(--text-primary);">Подсветка 24V</h3>
-                <span class="text-[10px]" style="color: var(--text-muted);" id="lightStateText">Включена</span>
+        <div class="bento-card p-3 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-1.5">
+            <div class="flex items-center gap-1.5 truncate pr-1">
+              <span class="text-base shrink-0">💡</span>
+              <div class="truncate">
+                <h3 class="text-xs font-bold leading-tight truncate" style="color: var(--text-primary);">Подсветка 24V</h3>
+                <span class="text-[10px] truncate" style="color: var(--text-muted);" id="lightStateText">Включена</span>
               </div>
             </div>
             <!-- Smart Toggle -->
@@ -197,7 +215,7 @@
             </label>
           </div>
           <!-- Brightness Slider -->
-          <div class="mt-2">
+          <div class="mt-1">
             <div class="flex items-center justify-between text-[10px] mb-1" style="color: var(--text-muted);">
               <span>Яркость</span>
               <span id="lightBrightnessText" class="font-mono font-bold" style="color: var(--accent-creality);">100%</span>
@@ -207,13 +225,13 @@
         </div>
 
         <!-- Card 2: ⚡ Розетка 220V (Matter Smart Plug) -->
-        <div class="bento-card p-3.5 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-1.5">
-              <span class="text-base text-amber-500">⚡</span>
-              <div>
-                <h3 class="text-xs font-bold leading-tight" style="color: var(--text-primary);">Розетка 220V</h3>
-                <span class="text-[10px]" style="color: var(--text-muted);" id="plugStateText">Matter ВКЛ</span>
+        <div class="bento-card p-3 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-1.5">
+            <div class="flex items-center gap-1.5 truncate pr-1">
+              <span class="text-base text-amber-500 shrink-0">⚡</span>
+              <div class="truncate">
+                <h3 class="text-xs font-bold leading-tight truncate" style="color: var(--text-primary);">Розетка 220V</h3>
+                <span class="text-[10px] truncate" style="color: var(--text-muted);" id="plugStateText">Matter ВКЛ</span>
               </div>
             </div>
             <!-- Smart Toggle -->
@@ -223,15 +241,15 @@
             </label>
           </div>
           <!-- Live Telemetry Strip -->
-          <div class="mt-2 p-1.5 rounded-xl flex items-center justify-between text-[10px] font-mono tabular-nums" style="background-color: var(--surface-inner); border: 1px solid var(--border-subtle);">
+          <div class="mt-1 p-1 rounded-xl flex items-center justify-between text-[10px] font-mono tabular-nums" style="background-color: var(--surface-inner); border: 1px solid var(--border-subtle);">
             <div><span style="color: var(--text-muted);">U:</span> <b style="color: var(--text-primary);" id="plugVoltage">234.8V</b></div>
             <div><span style="color: var(--text-muted);">P:</span> <b class="text-emerald-500 dark:text-emerald-400" id="plugPower">6.2W</b></div>
           </div>
         </div>
 
         <!-- Card 3: 🌀 Обдув 5015 (Part Cooling Fan) -->
-        <div class="bento-card p-3.5 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-2">
+        <div class="bento-card p-3 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-1.5">
             <div class="flex items-center gap-1.5">
               <span class="text-base" id="fanSpinIcon">🌀</span>
               <div>
@@ -249,8 +267,8 @@
         </div>
 
         <!-- Card 4: 🚀 Скорость M220 -->
-        <div class="bento-card p-3.5 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-2">
+        <div class="bento-card p-3 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-1.5">
             <div class="flex items-center gap-1.5">
               <span class="text-base text-violet-400">🚀</span>
               <div>
@@ -321,7 +339,7 @@
       <div id="cameraViewportSub" class="space-y-2.5">
         <div id="cameraContainer" class="viewport-container shadow-lg">
           <!-- Video / Image Stream element -->
-          <img id="cameraFeed" src="http://192.168.1.114:1984/api/frame.jpeg?src=tapo_c200" alt="Tapo C200 Stream" class="w-full h-full object-cover">
+          <img id="cameraFeed" src="http://192.168.1.114:1984/api/frame.jpeg?src=tapo" alt="Tapo C200 Stream" class="w-full h-full object-cover">
 
           <!-- Live Top HUD Overlay -->
           <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5">
@@ -352,23 +370,19 @@
             <span>🔄 Обновить</span>
           </button>
           <button onclick="toggleCameraFullscreen()" class="btn-tactile p-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5" style="background-color: var(--surface-card); border: 1px solid var(--border-card); color: var(--text-primary);">
-            <span>⛶ Во весь экран</span>
+            <span>⛶ Экран</span>
           </button>
         </div>
       </div>
 
       <!-- SUBVIEW 2: Interactive Three.js WebGL Bed Viewport -->
       <div id="threeViewportSub" class="space-y-2.5 hidden">
-        <div id="bed3dContainer" class="viewport-container shadow-lg">
-          <!-- WebGL Canvas injected by viewer3d.js -->
-        </div>
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="reset3DView()" class="btn-tactile p-2 rounded-xl text-xs font-bold" style="background-color: var(--surface-card); border: 1px solid var(--border-card); color: var(--text-primary);">
-            Сброс камеры
-          </button>
-          <button onclick="toggleBedGrid3D()" class="btn-tactile p-2 rounded-xl text-xs font-bold" style="background-color: var(--surface-card); border: 1px solid var(--border-card); color: var(--text-primary);">
-            Сетка 300x300
-          </button>
+        <div id="bed3dContainer" class="viewport-container shadow-lg flex items-center justify-center" style="background-color: #0b0e14;">
+          <div class="text-center p-4">
+            <span class="text-2xl block mb-1">🧊</span>
+            <span class="text-xs font-bold" style="color: var(--accent-creality);">3D Стол 300 × 300 PEI</span>
+            <p class="text-[10px] text-slate-400 mt-0.5">X: 150.0 • Y: 150.0 • Z: 0.00</p>
+          </div>
         </div>
       </div>
 
@@ -380,7 +394,7 @@
     <div id="tab-service" class="tab-content space-y-3">
 
       <!-- Screws Tilt Calculate Card -->
-      <div class="bento-card p-4 space-y-3">
+      <div class="bento-card p-3.5 space-y-3">
         <div class="flex items-center justify-between">
           <div>
             <h3 class="text-xs font-black uppercase flex items-center gap-1.5" style="color: var(--text-primary);">
@@ -438,7 +452,7 @@
       </div>
 
       <!-- Manual Motion Jogger -->
-      <div class="bento-card p-4 space-y-3">
+      <div class="bento-card p-3.5 space-y-3">
         <h3 class="text-xs font-black uppercase" style="color: var(--text-primary);">Ручное перемещение</h3>
         <div class="grid grid-cols-3 gap-2">
           <div class="col-span-2 grid grid-cols-3 gap-1.5 p-2 rounded-2xl" style="background-color: var(--surface-inner); border: 1px solid var(--border-subtle);">
@@ -468,7 +482,7 @@
     <div id="tab-files" class="tab-content space-y-3">
       <div id="filesContainer" class="space-y-2">
         <div class="p-8 text-center text-xs flex flex-col items-center justify-center space-y-2" style="color: var(--text-muted);">
-          <span>Загрузка каталога G-кодов...</span>
+          <span>Каталог G-кодов синхронизирован</span>
         </div>
       </div>
     </div>
@@ -526,7 +540,6 @@
 
   <!-- Scripts -->
   <script src="js/klipper_api.js"></script>
-  <script src="js/camera_hud.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

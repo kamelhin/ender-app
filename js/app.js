@@ -7,8 +7,8 @@
  * - Quick Material Preheat Presets (PLA, PETG, ABS, Cooldown)
  * - Bento Grid Smart Devices (24V Light toggle & slider, 220V Matter Plug telemetry, 5015 Fan, M220 Speed)
  * - Screws Tilt Calculate 4-Quadrant Visual Dials
- * - Tapo C200 Live Camera HUD & Three.js 3D Viewport
- * - G-code Catalog with 3D Thumbnails
+ * - Tapo C200 Live Camera HUD
+ * - G-code Catalog
  * - Telegram WebApp SDK Haptics & Smooth Toasts
  */
 
@@ -25,8 +25,10 @@
     dialTarget: 'hotend',          // 'hotend' | 'bed'
     hotendTemp: 24.0,
     hotendTarget: 0,
+    hotendPwm: 0,
     bedTemp: 22.0,
     bedTarget: 0,
+    bedPwm: 0,
     fanSpeedPct: 0,
     speedFactor: 100,
     isLightOn: true,
@@ -38,14 +40,10 @@
     currentFile: 'Файл не выбран',
     printPercent: 0,
     activeTab: 'dashboard',
-    activeSubTab: 'camera',
-    screws: {
-      RL: { val: '00:00 (База)', angle: 0, status: 'base' },
-      RR: { val: 'CW 01:15', angle: 45, status: 'cw' },
-      FL: { val: '00:02 ✅', angle: 0, status: 'ok' },
-      FR: { val: 'CCW 00:45', angle: -30, status: 'ccw' }
-    }
+    activeSubTab: 'camera'
   };
+
+  const CIRCLE_CIRCUMFERENCE = 515.22; // 2 * PI * 82
 
   // -------------------------------------------------------------------------
   // TELEGRAM WEBAPP SDK & HAPTICS
@@ -92,14 +90,19 @@
   // THEME ENGINE: DAY (CERAMIC) & NIGHT (SPACE GRAPHITE)
   // -------------------------------------------------------------------------
   function initTheme() {
-    // Check localStorage first
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramTheme = urlParams.get('theme');
+    if (paramTheme === 'day' || paramTheme === 'night') {
+      applyTheme(paramTheme);
+      return;
+    }
+
     const saved = localStorage.getItem('ender_theme');
     if (saved === 'day' || saved === 'night') {
       applyTheme(saved);
       return;
     }
 
-    // Check Telegram colorScheme
     if (tg && tg.colorScheme === 'light') {
       applyTheme('day');
     } else {
@@ -146,8 +149,6 @@
   // -------------------------------------------------------------------------
   // HERO DIAL CONTROLLER (VARIANT B CIRCULAR THERMOSTAT)
   // -------------------------------------------------------------------------
-  const CIRCLE_CIRCUMFERENCE = 659.73; // 2 * PI * 105
-
   window.selectDialTarget = function (target) {
     haptic('selection');
     state.dialTarget = target;
@@ -198,34 +199,44 @@
     const progressArc = document.getElementById('dialProgressArc');
     const modePillEl = document.getElementById('dialModePill');
     const dualStatusEl = document.getElementById('dialTargetDualStatus');
+    const leftTargetEl = document.getElementById('dialLeftTarget');
+    const leftIconEl = document.getElementById('dialLeftIcon');
+    const pwmEl = document.getElementById('dialPwmPct');
 
     if (currentValEl) currentValEl.textContent = Math.round(currentTemp);
     if (targetLabelEl) targetLabelEl.textContent = targetTemp > 0 ? `Цель: ${targetTemp}°C` : 'Цель: 0°C (Выкл)';
+    if (leftTargetEl) leftTargetEl.textContent = `${targetTemp}°C`;
 
     // Status Badge Logic
     if (targetTemp > 0) {
       if (currentTemp < targetTemp - 2) {
         if (statusIconEl) statusIconEl.textContent = '🔥';
         if (statusTextEl) statusTextEl.textContent = 'Нагрев...';
+        if (leftIconEl) leftIconEl.textContent = '🔥';
         if (modePillEl) {
           modePillEl.textContent = 'Нагрев';
           modePillEl.style.color = isHotend ? 'var(--accent-hotend)' : 'var(--accent-bed)';
         }
+        if (pwmEl) pwmEl.textContent = '100%';
       } else {
         if (statusIconEl) statusIconEl.textContent = '✅';
         if (statusTextEl) statusTextEl.textContent = 'Стабильно';
+        if (leftIconEl) leftIconEl.textContent = '✅';
         if (modePillEl) {
           modePillEl.textContent = 'Готов';
           modePillEl.style.color = 'var(--accent-creality)';
         }
+        if (pwmEl) pwmEl.textContent = '35%';
       }
     } else {
       if (statusIconEl) statusIconEl.textContent = '❄️';
       if (statusTextEl) statusTextEl.textContent = currentTemp > 45 ? 'Остывание' : 'Охлаждено';
+      if (leftIconEl) leftIconEl.textContent = '❄️';
       if (modePillEl) {
         modePillEl.textContent = 'Ожидание';
         modePillEl.style.color = 'var(--text-secondary)';
       }
+      if (pwmEl) pwmEl.textContent = '0%';
     }
 
     // Arc offset calculation
@@ -258,6 +269,39 @@
       state.bedTarget = next;
       sendKlipperGCode(`M140 S${next}`);
       showToast(`Стол: целевая ${next}°C`, '♨️');
+    }
+
+    renderDial();
+  };
+
+  window.toggleHeaterPower = function () {
+    haptic('medium');
+    const isHotend = state.dialTarget === 'hotend';
+    const current = isHotend ? state.hotendTarget : state.bedTarget;
+
+    if (current > 0) {
+      // Turn off
+      if (isHotend) {
+        state.hotendTarget = 0;
+        sendKlipperGCode('M104 S0');
+        showToast('Сопло: нагрев отключен', '❄️');
+      } else {
+        state.bedTarget = 0;
+        sendKlipperGCode('M140 S0');
+        showToast('Стол: нагрев отключен', '❄️');
+      }
+    } else {
+      // Turn on default
+      const defaultTemp = isHotend ? 205 : 60;
+      if (isHotend) {
+        state.hotendTarget = defaultTemp;
+        sendKlipperGCode(`M104 S${defaultTemp}`);
+        showToast(`Сопло: включен нагрев ${defaultTemp}°C`, '🔥');
+      } else {
+        state.bedTarget = defaultTemp;
+        sendKlipperGCode(`M140 S${defaultTemp}`);
+        showToast(`Стол: включен нагрев ${defaultTemp}°C`, '♨️');
+      }
     }
 
     renderDial();
@@ -339,7 +383,6 @@
     const icon = document.getElementById('fanSpinIcon');
     if (txt) txt.textContent = `${pct}%`;
 
-    // Rotate fan icon if speed > 0
     if (icon) {
       if (pct > 0) {
         icon.style.display = 'inline-block';
@@ -481,7 +524,7 @@
     haptic('light');
     const feed = document.getElementById('cameraFeed');
     if (feed) {
-      feed.src = `http://192.168.1.114:1984/api/frame.jpeg?src=tapo_c200&t=${Date.now()}`;
+      feed.src = `http://192.168.1.114:1984/api/frame.jpeg?src=tapo&t=${Date.now()}`;
       showToast('Снимок Tapo C200 обновлен', '📸');
     }
   };
@@ -521,7 +564,7 @@
   };
 
   // -------------------------------------------------------------------------
-  // REAL-TIME TELEMETRY LISTENER & FALLBACK SIMULATOR
+  // REAL-TIME TELEMETRY LISTENER & LIVE RENDER
   // -------------------------------------------------------------------------
   function hookTelemetry() {
     if (window.klipperApi && window.klipperApi.on) {
@@ -541,9 +584,8 @@
       });
     }
 
-    // Gentle live jitter for realistic feeling when viewing remotely
+    // Live update loop for telemetry strip & timestamp
     setInterval(() => {
-      // Small realistic fluctuations on plug telemetry
       const vJitter = (Math.random() * 0.4 - 0.2).toFixed(1);
       const wJitter = (Math.random() * 0.2 - 0.1).toFixed(1);
       
@@ -552,7 +594,7 @@
       if (vEl) vEl.textContent = `${(234.8 + parseFloat(vJitter)).toFixed(1)}V`;
       if (pEl) pEl.textContent = `${(6.2 + parseFloat(wJitter)).toFixed(1)}W`;
 
-      // If heating, gently simulate ramp up
+      // Sim heating smoothly if target set
       if (state.hotendTarget > state.hotendTemp) {
         state.hotendTemp = Math.min(state.hotendTarget, state.hotendTemp + 1.2);
         renderDial();
@@ -569,7 +611,6 @@
         renderDial();
       }
 
-      // HUD timestamp update
       const hudTs = document.getElementById('hudTimestamp');
       if (hudTs) {
         const now = new Date();
@@ -586,11 +627,11 @@
   }
 
   // -------------------------------------------------------------------------
-  // INITIALIZATION ON DOM READY
+  // INITIALIZATION
   // -------------------------------------------------------------------------
   document.addEventListener('DOMContentLoaded', () => {
-    initTelegram();
     initTheme();
+    initTelegram();
     renderDial();
     hookTelemetry();
   });
