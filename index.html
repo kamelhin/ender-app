@@ -63,11 +63,6 @@
         <span id="themeIcon">☀️</span>
       </button>
 
-      <!-- Quick Lights Switcher -->
-      <button id="btnNozzleLight" onclick="toggleLight()" title="Подсветка 24V" class="p-2 rounded-xl btn-tactile" style="background-color: var(--surface-card); border: 1px solid var(--border-card); color: var(--text-primary); min-height:36px; min-width:36px;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="iconNozzleLight"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-      </button>
-
       <!-- Quick Telemetry Reload -->
       <button id="btnRefreshTelemetry" onclick="manualRefreshTelemetry()" title="Обновить статус" class="p-2 rounded-xl btn-tactile" style="background-color: var(--surface-card); border: 1px solid var(--border-card); color: var(--text-primary); min-height:36px; min-width:36px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="refreshIcon"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
@@ -194,44 +189,18 @@
       </div>
 
       <!-- ===================================================================== -->
-      <!-- BENTO SMART PERIPHERALS GRID (LIGHTS, 220V MATTER PLUG, FAN, SPEED) -->
+      <!-- BENTO SMART PERIPHERALS GRID (220V MATTER PLUG, FAN, SPEED) -->
       <!-- ===================================================================== -->
       <div class="grid grid-cols-2 gap-2.5">
 
-        <!-- Card 1: 💡 Подсветка 24V (Light Control) -->
-        <div class="bento-card p-3 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-1.5">
-            <div class="flex items-center gap-1.5 truncate pr-1">
-              <span class="text-base shrink-0">💡</span>
-              <div class="truncate">
-                <h3 class="text-xs font-bold leading-tight truncate" style="color: var(--text-primary);">Подсветка 24V</h3>
-                <span class="text-[10px] truncate" style="color: var(--text-muted);" id="lightStateText">Включена</span>
-              </div>
-            </div>
-            <!-- Smart Toggle -->
-            <label class="smart-toggle">
-              <input type="checkbox" id="toggleLightInput" checked onchange="handleLightToggle(this.checked)">
-              <span class="smart-slider"></span>
-            </label>
-          </div>
-          <!-- Brightness Slider -->
-          <div class="mt-1">
-            <div class="flex items-center justify-between text-[10px] mb-1" style="color: var(--text-muted);">
-              <span>Яркость</span>
-              <span id="lightBrightnessText" class="font-mono font-bold" style="color: var(--accent-creality);">100%</span>
-            </div>
-            <input type="range" min="10" max="100" value="100" class="tactile-range" id="lightBrightnessSlider" oninput="handleLightBrightness(this.value)">
-          </div>
-        </div>
-
-        <!-- Card 2: ⚡ Розетка 220V (Matter Smart Plug) -->
-        <div class="bento-card p-3 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-1.5">
-            <div class="flex items-center gap-1.5 truncate pr-1">
-              <span class="text-base text-amber-500 shrink-0">⚡</span>
-              <div class="truncate">
-                <h3 class="text-xs font-bold leading-tight truncate" style="color: var(--text-primary);">Розетка 220V</h3>
-                <span class="text-[10px] truncate" style="color: var(--text-muted);" id="plugStateText">Matter ВКЛ</span>
+        <!-- Card 1 (Full Width): ⚡ Розетка 220V (Matter Smart Plug) -->
+        <div class="col-span-2 bento-card p-3.5 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xl text-amber-500 shrink-0">⚡</span>
+              <div>
+                <h3 class="text-xs font-bold leading-tight" style="color: var(--text-primary);">Электросеть 220V (Matter)</h3>
+                <span class="text-[10px]" style="color: var(--text-muted);" id="plugStateText">Умная розетка ВКЛ</span>
               </div>
             </div>
             <!-- Smart Toggle -->
@@ -240,14 +209,24 @@
               <span class="smart-slider"></span>
             </label>
           </div>
-          <!-- Live Telemetry Strip -->
-          <div class="mt-1 p-1 rounded-xl flex items-center justify-between text-[10px] font-mono tabular-nums" style="background-color: var(--surface-inner); border: 1px solid var(--border-subtle);">
-            <div><span style="color: var(--text-muted);">U:</span> <b style="color: var(--text-primary);" id="plugVoltage">234.8V</b></div>
-            <div><span style="color: var(--text-muted);">P:</span> <b class="text-emerald-500 dark:text-emerald-400" id="plugPower">6.2W</b></div>
+          <!-- Live Telemetry Strip with 3 metrics: Voltage, Power, Amperage -->
+          <div class="p-2 rounded-xl grid grid-cols-3 gap-2 text-center text-xs font-mono tabular-nums" style="background-color: var(--surface-inner); border: 1px solid var(--border-subtle);">
+            <div>
+              <span class="text-[9px] uppercase font-bold tracking-wider block" style="color: var(--text-muted);">Напряжение</span>
+              <b style="color: var(--text-primary);" id="plugVoltage">234.8 V</b>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold tracking-wider block" style="color: var(--text-muted);">Мощность</span>
+              <b class="text-emerald-500 dark:text-emerald-400" id="plugPower">6.2 W</b>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold tracking-wider block" style="color: var(--text-muted);">Ток</span>
+              <b style="color: var(--text-primary);" id="plugAmps">0.05 A</b>
+            </div>
           </div>
         </div>
 
-        <!-- Card 3: 🌀 Обдув 5015 (Part Cooling Fan) -->
+        <!-- Card 2: 🌀 Обдув 5015 (Part Cooling Fan) -->
         <div class="bento-card p-3 flex flex-col justify-between">
           <div class="flex items-center justify-between mb-1.5">
             <div class="flex items-center gap-1.5">
@@ -266,7 +245,7 @@
           </div>
         </div>
 
-        <!-- Card 4: 🚀 Скорость M220 -->
+        <!-- Card 3: 🚀 Скорость M220 -->
         <div class="bento-card p-3 flex flex-col justify-between">
           <div class="flex items-center justify-between mb-1.5">
             <div class="flex items-center gap-1.5">

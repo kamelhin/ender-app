@@ -591,8 +591,10 @@
       
       const vEl = document.getElementById('plugVoltage');
       const pEl = document.getElementById('plugPower');
-      if (vEl) vEl.textContent = `${(234.8 + parseFloat(vJitter)).toFixed(1)}V`;
-      if (pEl) pEl.textContent = `${(6.2 + parseFloat(wJitter)).toFixed(1)}W`;
+      const aEl = document.getElementById('plugAmps');
+      if (vEl) vEl.textContent = `${(234.8 + parseFloat(vJitter)).toFixed(1)} V`;
+      if (pEl) pEl.textContent = `${(6.2 + parseFloat(wJitter)).toFixed(1)} W`;
+      if (aEl) aEl.textContent = '0.05 A';
 
       // Sim heating smoothly if target set
       if (state.hotendTarget > state.hotendTemp) {
